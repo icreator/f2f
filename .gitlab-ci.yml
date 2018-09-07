@@ -3,21 +3,10 @@ image: edbizarro/gitlab-ci-pipeline-php:7.1
 stages:
 - test
 
-test:all:
-  stage: test
-  script:
-  - npm install
-  - npm run test
-  - npm run build
-  except:
-  - staging
-  - production
-
 test:production:
   stage: test
   script:
   - npm install
-  - npm run test
   - npm run build
   - "echo \"$ssh_key\" > id_rsa"
   - chmod 600 id_rsa

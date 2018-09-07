@@ -56,7 +56,7 @@ class CurrencySelector extends React.Component {
             current: currency.code
           })}
         >
-          <img src={currency.icon_light} className="currency-icon"/> <span className="currency-name">{currency.name}</span>
+          <img alt={currency.code} src={currency.icon_light} className="currency-icon"/> <span className="currency-name">{currency.name}</span>
         </li>)
       }
       dropdown = <ul className="dropdown">
@@ -66,7 +66,7 @@ class CurrencySelector extends React.Component {
 
     if (this.props.value) {
       value = [
-        <img key="icon" src={this.props.value.icon_light} className="currencyIcon"/>,
+        <img alt={this.props.value.code} key="icon" src={this.props.value.icon_light} className="currencyIcon"/>,
         <span key="name" className="currency-name">{this.props.value.name}</span>
       ];
     }

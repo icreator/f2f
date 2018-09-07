@@ -1,0 +1,95 @@
+@font-face {
+  font-family: 'Neo Sans Pro';
+  src: url('/fonts/hinted-NeoSansPro-BoldItalic.eot');
+  src: url('/fonts/hinted-NeoSansPro-BoldItalic.eot?#iefix') format('embedded-opentype'),
+  url('/fonts/hinted-NeoSansPro-BoldItalic.woff2') format('woff2'),
+  url('/fonts/hinted-NeoSansPro-BoldItalic.woff') format('woff'),
+  url('/fonts/hinted-NeoSansPro-BoldItalic.ttf') format('truetype'),
+  url('/fonts/hinted-NeoSansPro-BoldItalic.svg#NeoSansPro-BoldItalic') format('svg');
+  font-weight: bold;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'Neo Sans Pro';
+  src: url('/fonts/hinted-NeoSansPro-Light.eot');
+  src: url('/fonts/hinted-NeoSansPro-Light.eot?#iefix') format('embedded-opentype'),
+  url('/fonts/hinted-NeoSansPro-Light.woff2') format('woff2'),
+  url('/fonts/hinted-NeoSansPro-Light.woff') format('woff'),
+  url('/fonts/hinted-NeoSansPro-Light.ttf') format('truetype'),
+  url('/fonts/hinted-NeoSansPro-Light.svg#NeoSansPro-Light') format('svg');
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Neo Sans Pro';
+  src: url('/fonts/hinted-NeoSansPro-LightItalic.eot');
+  src: url('/fonts/hinted-NeoSansPro-LightItalic.eot?#iefix') format('embedded-opentype'),
+  url('/fonts/hinted-NeoSansPro-LightItalic.woff2') format('woff2'),
+  url('/fonts/hinted-NeoSansPro-LightItalic.woff') format('woff'),
+  url('/fonts/hinted-NeoSansPro-LightItalic.ttf') format('truetype'),
+  url('/fonts/hinted-NeoSansPro-LightItalic.svg#NeoSansPro-LightItalic') format('svg');
+  font-weight: 300;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'Neo Sans Pro';
+  src: url('/fonts/hinted-NeoSansPro-Ultra.eot');
+  src: url('/fonts/hinted-NeoSansPro-Ultra.eot?#iefix') format('embedded-opentype'),
+  url('/fonts/hinted-NeoSansPro-Ultra.woff2') format('woff2'),
+  url('/fonts/hinted-NeoSansPro-Ultra.woff') format('woff'),
+  url('/fonts/hinted-NeoSansPro-Ultra.ttf') format('truetype'),
+  url('/fonts/hinted-NeoSansPro-Ultra.svg#NeoSansPro-Ultra') format('svg');
+  font-weight: 900;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Neo Sans Pro';
+  src: url('/fonts/hinted-NeoSansPro-Bold.eot');
+  src: url('/fonts/hinted-NeoSansPro-Bold.eot?#iefix') format('embedded-opentype'),
+  url('/fonts/hinted-NeoSansPro-Bold.woff2') format('woff2'),
+  url('/fonts/hinted-NeoSansPro-Bold.woff') format('woff'),
+  url('/fonts/hinted-NeoSansPro-Bold.ttf') format('truetype'),
+  url('/fonts/hinted-NeoSansPro-Bold.svg#NeoSansPro-Bold') format('svg');
+  font-weight: bold;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Neo Sans Pro';
+  src: url('/fonts/hinted-NeoSansPro-Medium.eot');
+  src: url('/fonts/hinted-NeoSansPro-Medium.eot?#iefix') format('embedded-opentype'),
+  url('/fonts/hinted-NeoSansPro-Medium.woff2') format('woff2'),
+  url('/fonts/hinted-NeoSansPro-Medium.woff') format('woff'),
+  url('/fonts/hinted-NeoSansPro-Medium.ttf') format('truetype'),
+  url('/fonts/hinted-NeoSansPro-Medium.svg#NeoSansPro-Medium') format('svg');
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Neo Sans Pro';
+  src: url('/fonts/hinted-NeoSansPro-Italic.eot');
+  src: url('/fonts/hinted-NeoSansPro-Italic.eot?#iefix') format('embedded-opentype'),
+  url('/fonts/hinted-NeoSansPro-Italic.woff2') format('woff2'),
+  url('/fonts/hinted-NeoSansPro-Italic.woff') format('woff'),
+  url('/fonts/hinted-NeoSansPro-Italic.ttf') format('truetype'),
+  url('/fonts/hinted-NeoSansPro-Italic.svg#NeoSansPro-Italic') format('svg');
+  font-weight: normal;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'Neo Sans Pro';
+  src: url('/fonts/hinted-NeoSansPro-Regular.eot');
+  src: url('/fonts/hinted-NeoSansPro-Regular.eot?#iefix') format('embedded-opentype'),
+  url('/fonts/hinted-NeoSansPro-Regular.woff2') format('woff2'),
+  url('/fonts/hinted-NeoSansPro-Regular.woff') format('woff'),
+  url('/fonts/hinted-NeoSansPro-Regular.ttf') format('truetype'),
+  url('/fonts/hinted-NeoSansPro-Regular.svg#NeoSansPro-Regular') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}

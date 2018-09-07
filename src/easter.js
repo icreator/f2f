@@ -1,0 +1,21 @@
+import 'console.image';
+
+(async () => {
+  console.image('http://localhost:3000/img/loader.png', 1);
+  setTimeout(() => {
+    console.log('%cWelcome to Face2Face.', 'font-size: 15px;');
+    console.log('%cCode by Alexey Ermolaev (http://dotterian.ru)', 'font-size: 10px;');
+  }, 100);
+})();
+
+window.kitty = () => {
+  console.log('%cHere\'s some kitty for you:', 'font-size: 15px; font-weight: bold;');
+  const width = Math.ceil(150 + Math.random() * 400);
+  const height = Math.ceil(150 + Math.random() * 400);
+  const isGrayscale = Math.random() >= 0.5;
+  let link = `http://placekitten.com/${width}/${height}`;
+  if (isGrayscale) {
+    link = `http://placekitten.com/g/${width}/${height}`;
+  }
+  console.image(link, 1);
+};

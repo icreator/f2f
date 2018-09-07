@@ -1,0 +1,27 @@
+image: edbizarro/gitlab-ci-pipeline-php:7.1
+
+stages:
+- test
+
+test:all:
+  stage: test
+  script:
+  - npm install
+  - npm run test
+  - npm run build
+  except:
+  - staging
+  - production
+
+test:production:
+  stage: test
+  script:
+  - npm install
+  - npm run test
+  - npm run build
+  - "echo \"$ssh_key\" > id_rsa"
+  - chmod 600 id_rsa
+  - ssh -i id_rsa -o StrictHostKeyChecking=no root@face2face.dotterian.ru "rm -rf /var/www/face2face/* || true"
+  - "scp -r -i id_rsa -o StrictHostKeyChecking=no build/* root@face2face.dotterian.ru:/var/www/face2face"
+  only:
+  - production

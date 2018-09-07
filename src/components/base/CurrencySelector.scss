@@ -1,0 +1,74 @@
+.currency-selector-container {
+  position: relative;
+
+  img {
+    margin-right: 15px;
+  }
+
+  .field {
+    font-size: 16px;
+    letter-spacing: 0.1em;
+    transition: all .3s;
+    border: 1px solid transparent;
+    border-bottom: 1px solid #758597;
+    padding: 8px;
+    position: relative;
+    margin-bottom: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    /*height: 36px;*/
+
+    &::after {
+      display: block;
+      content: '';
+      width: 14px;
+      height: 7px;
+      background: url('/img/dropdown-arrow.png');
+      position: absolute;
+      right: 8px;
+    }
+
+    &:hover {
+      border-bottom-color: #a6d942;
+    }
+
+    &.active {
+      background: #ffffff;
+      border: 1px solid #a6d942;
+      box-shadow: 0 0 6px rgba(166,217,66,0.25);
+
+      &::after {
+        background: url('/img/dropdown-arrow-active.png');
+      }
+    }
+  }
+
+  .dropdown {
+    list-style: none;
+    position: absolute;
+    padding: 8px;
+    z-index: 2;
+    background: rgba(255,255,255,0.99);
+    width: 100%;
+    top: 46px;
+    border-radius: 0 0 4px 4px;
+    box-shadow: 0 14px 24px rgba(35,41,48,0.29);
+
+    li {
+      border-bottom: 1px solid #c1c8cf;
+      display: flex;
+      align-items: center;
+      padding: 8px;
+      cursor: pointer;
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      &.current {
+        background: #c1c8cf;
+      }
+    }
+  }
+}

@@ -1,0 +1,13 @@
+{
+    "name": "Face2Face",
+    "short_name": "Face2Face",
+    "icons": [
+        {
+            "src": "/icons/android-chrome-96x96.png",
+            "sizes": "96x96",
+            "type": "image/png"
+        }
+    ],
+    "theme_color": "#ffffff",
+    "background_color": "#ffffff"
+}

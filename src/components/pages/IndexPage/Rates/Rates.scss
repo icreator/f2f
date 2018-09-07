@@ -1,0 +1,80 @@
+.rates {
+  box-sizing: content-box;
+  background: url('/img/rates-bg.png') top center no-repeat;
+  width: 100%;
+  max-width: 1198px;
+  height: 481px;
+  margin: 130px auto 0;
+  padding-bottom: 180px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+
+  .section-name {
+    margin: -10px;
+    width: 100%;
+  }
+
+  .rates-table {
+    margin-top: -(18 / 711 * 100%);
+    border-radius: 10px;
+    background-image: linear-gradient(to bottom, #20272e, #3e4348);
+    box-shadow: 0 12px 35px rgba(32,39,46,0.75),
+    inset 0 0 6px 3px rgba(255,255,255,0.09);
+    display: flex;
+    flex-wrap: wrap;
+    padding: 10px 0 10px;
+    z-index: 10;
+
+    & > div {
+      margin-top: 25px;
+      margin-bottom: 25px;
+      padding: 0 0 0 33px;
+      border-left: 1px solid #9ea8b3;
+      width: 20%;
+
+      &:nth-child(6),
+      &:first-child {
+        border-left: none;
+      }
+
+      & > div {
+        display: flex;
+        align-items: center;
+
+        img {
+          float: left;
+          margin-right: 18px;
+        }
+        .curr-name {
+          font-size: 14px;
+          color: #fff;
+          display: block;
+        }
+        /*.rate-change {
+          font-size: 12px;
+          margin-top: 5px;
+          display: block;
+          &.good {
+            color: #a6d942;
+          }
+          &.bad {
+            color: #ff3f3f;
+          }
+        }*/
+      }
+      .rate-usd {
+        font-size: 14px;
+        color: #fff;
+        display: block;
+        margin-top: 8px;
+      }
+      .rate-btc {
+        font-size: 14px;
+        color: #8599b1;
+        margin-top: 5px;
+        display: block;
+      }
+    }
+  }
+}

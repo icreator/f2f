@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { BrowserRouter as Router, Switch } from 'react-router-dom';
-import { TranslationContainer } from "./components/i18n";
 import { PreloaderRoute } from "./components/Preloader";
 import DefaultLayout from './components/layout/DefaultLayout';
 import IndexPage from "./components/pages/IndexPage/IndexPage";

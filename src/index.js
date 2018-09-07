@@ -6,7 +6,7 @@ import './easter.js';
 
 let root;
 const init = async () => {
-  const store = await i18n.loadLangs();
+  await i18n.loadLangs();
   const App = require('./App').default;
   root = ReactDOM.render(<App />, document.querySelector('#root'), root);
 };

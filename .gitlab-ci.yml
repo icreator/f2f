@@ -3,6 +3,15 @@ image: edbizarro/gitlab-ci-pipeline-php:7.1
 stages:
 - test
 
+test:all:
+  stage: test
+  script:
+  - npm install
+  - npm run build
+  except:
+  - staging
+  - production
+
 test:production:
   stage: test
   script:

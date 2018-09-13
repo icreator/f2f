@@ -58,8 +58,8 @@ class PaymentsPage extends React.Component {
             <a href="" target="_blank">{i18n.t('payments_page.table.block_explorer_link')}</a>
           </td>
           <td>
-            {data.status_in === "pending" && <img src="/img/payment-pending.png"/>}
-            {data.status_in === "complete" && <img src="/img/payment-confirmed.png"/>}
+            {data.status_in === "pending" && <img alt="" src="/img/payment-pending.png"/>}
+            {data.status_in === "complete" && <img alt="" src="/img/payment-confirmed.png"/>}
           </td>
           <td>
             {data.rate}
@@ -69,8 +69,8 @@ class PaymentsPage extends React.Component {
             <a href="" target="_blank">{i18n.t('payments_page.table.block_explorer_link')}</a>
           </td>
           <td>
-            {data.status_out === "pending" && <img src="/img/payment-pending.png"/>}
-            {data.status_out === "complete" && <img src="/img/payment-confirmed.png"/>}
+            {data.status_out === "pending" && <img alt="" src="/img/payment-pending.png"/>}
+            {data.status_out === "complete" && <img alt="" src="/img/payment-confirmed.png"/>}
           </td>
         </tr>);
       }

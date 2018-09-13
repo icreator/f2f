@@ -1,5 +1,5 @@
 .header {
-  .inner-header {
+  &.inner-header {
     background: #fff;
     border-bottom: 1px solid #a9b5c3;
   }
@@ -7,6 +7,10 @@
   .container {
     display: flex;
     align-items: center;
+  }
+
+  .logo {
+    margin-left: 15px;
   }
 
   .menu {
@@ -67,6 +71,11 @@
 
       &:hover {
         color: #aaa;
+      }
+
+      &.active {
+        color: #a6d942;
+        text-decoration: underline;
       }
     }
   }

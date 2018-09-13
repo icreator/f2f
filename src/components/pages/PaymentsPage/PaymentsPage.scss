@@ -1,0 +1,136 @@
+.payments-page {
+  width: 100%;
+  margin-top: 0 !important;
+
+  h1 {
+    margin-top: 60px;
+    margin-bottom: 90px;
+    text-align: center;
+    font-size: 24px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+  }
+
+  .search-container {
+    position: relative;
+
+    .search-bar {
+      width: 100%;
+      border: none;
+      border-bottom: 1px solid #a9b5c3;
+      font-size: 18px;
+      letter-spacing: 0.1em;
+      outline: none;
+      margin-bottom: 64px;
+      padding: 10px 15px;
+
+      &::placeholder {
+        font-size: 14px !important;
+        color: #919191;
+      }
+    }
+
+    &:after {
+      content: ' ';
+      display: block;
+      position: absolute;
+      border: none;
+      width: 24px;
+      height: 22px;
+      background: url("/img/search-inactive.png");
+      right: 10px;
+      top: 10px;
+    }
+
+    &.focus {
+      .search-bar {
+        border-bottom: 2px solid #a6d942;
+        margin-bottom: 63px;
+      }
+
+      &:after {
+          background-image: url("/img/search-active.png");
+      }
+    }
+  }
+
+  .not-found {
+    display: block;
+    width: 100%;
+    text-align: center;
+    font-size: 24px;
+  }
+
+  .search-table {
+    width: 100%;
+    max-width: 100%;
+    border-width: 0;
+    border-collapse: collapse;
+    border-radius: 6px;
+    background: linear-gradient(to bottom, #20272e, #3e4348);
+    box-shadow: 0 9px 18px rgba(32,39,46,0.5),
+      inset 0 0 6px 3px rgba(255,255,255,0.09);
+    margin-bottom: 65px;
+
+    tr {
+      color: #fff;
+      border-bottom: 1px solid #5a626a;
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      td {
+        text-align: center;
+        padding: 15px 0;
+        font-size: 14px;
+
+        &:first-child {
+          padding-left: 25px;
+        }
+
+        &:last-child {
+          padding-right: 25px;
+        }
+
+        a {
+          color: #7e91a8;
+        }
+      }
+    }
+
+    thead>tr{
+      background: linear-gradient(to bottom, #20262e, #232930);
+      letter-spacing: 0.1em;
+      border-bottom: 1px solid #a6d942 !important;
+
+      th {
+        text-align: center;
+        padding: 25px 0;
+        font-weight: normal;
+      }
+
+      &:first-child th:first-child {
+        border-top-left-radius: 10px;
+      }
+      &:first-child th:last-child {
+        border-top-right-radius: 10px;
+      }
+    }
+
+    .show-more {
+      width: 100%;
+      height: 100%;
+      background: transparent;
+      border: none;
+      color: #c2cbd3;
+      cursor: pointer;
+      outline: none;
+
+      &:hover {
+        color: #a6d942;
+        text-decoration: underline;
+      }
+    }
+  }
+}

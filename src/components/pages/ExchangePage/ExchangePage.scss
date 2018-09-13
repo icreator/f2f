@@ -1,3 +1,299 @@
 .exchange-page {
+  h1 {
+    margin-top: 60px;
+    margin-bottom: 90px;
+    text-align: center;
+    font-size: 24px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+  }
 
+  .rate-info {
+    border-radius: 5px;
+    background: #e8ebf0;
+    padding: 15px 25px;
+    margin-top: 70px;
+    font-size: 16px;
+    font-weight: 300;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-align: center;
+    line-height: 32px;
+    margin-bottom: 54px;
+
+    .bold {
+      font-weight: normal;
+    }
+  }
+
+  .acceptance-checkboxes {
+    .row {
+      text-align: center;
+      margin-bottom: 30px;
+      font-weight: 300;
+      letter-spacing: 0.1em;
+      line-height: 26px;
+      font-size: 16px;
+
+      a {
+        color: #000;
+      }
+
+      .checkbox {
+        display: inline-block;
+        vertical-align: middle;
+        margin-top: -3px;
+        width: 16px;
+        height: 16px;
+        background: url('/img/checkbox-disabled.png');
+        margin-right: 15px;
+        cursor: pointer;
+
+        &.active {
+          background: url('/img/checkbox-enabled.png');
+        }
+      }
+      label {
+        cursor: pointer;
+      }
+    }
+  }
+
+  .accounts-box {
+    background: url("/img/accounts-bg.png") top left no-repeat;
+    max-width: 1120px;
+    padding-top: 471px;
+    margin: 125px auto 0;
+    position: relative;
+
+    .section-name {
+      color: rgba(35,41,48,0.21);
+      text-align: right;
+      position: absolute;
+      top: -35px;
+      right: 65px;
+    }
+
+    .accounts-fg {
+      background: url("/img/accounts-fg.png") top left no-repeat;
+      background-size: contain;
+      width: 100%;
+      padding-top: 446px;
+      position: absolute;
+      top: 25px;
+      left: 0;
+
+      .account-in-label {
+        position: absolute;
+        top: 76 / 446 * 100%;
+        left: 91 / 1120 * 100%;
+        letter-spacing: 0.1em;
+      }
+
+      .account-in-input {
+        position: absolute;
+        left: 89 / 1120 * 100%;
+        top: 109 / 446 * 100%;
+        width: 396 / 1120 * 100%;
+        font-weight: 300;
+        letter-spacing: 0.1em;
+        background: transparent;
+        border: 1px solid #232930;
+        padding: 9px 12px 11px;
+        outline: none;
+
+        &:focus {
+          border: 1px solid #FFF;
+          background: rgba(255,255,255,0.29);
+          box-shadow: 0 0 4px 2px rgba(255,255,255,0.35);
+        }
+
+        &.error {
+          border: 1px solid #ee6767;
+          box-shadow: 0 0 4px 2px rgba(255,0,0,0.3);
+        }
+      }
+
+      .account-in-error {
+        position: absolute;
+        color: #ff0000;
+        top: 171 / 446 * 100%;
+        left: 91 / 1120 * 100%;
+        letter-spacing: 0.1em;
+      }
+
+      .next-btn {
+        position: absolute;
+        background: none;
+        border: none;
+        top: 169 / 446 * 100%;
+        right: 634 / 1120 * 100%;
+        padding: 0;
+        margin: 0;
+        letter-spacing: 0.1em;
+        cursor: pointer;
+        outline: none;
+
+        &:hover {
+          text-decoration: underline;
+          color: #fff;
+        }
+      }
+
+      .account-out-label {
+        position: absolute;
+        letter-spacing: 0.1em;
+        top: 199 / 446 * 100%;
+        left: 622 / 1120 * 100%;
+        color: #fff;
+      }
+
+      .account-out-input {
+        position: absolute;
+        left: 620 / 1120 * 100%;
+        top: 233 / 446 * 100%;
+        border: 1px solid #fff;
+        font-weight: 300;
+        letter-spacing: 0.1em;
+        background: transparent;
+        padding: 9px 12px 11px;
+        width: 396 / 1120 * 100%;
+        color: #fff;
+        outline: none;
+        cursor: pointer;
+
+        &[value=""] {
+          border: 1px solid #555f6a;
+        }
+      }
+
+      .qr-code-btn {
+        position: absolute;
+        left: 622 / 1120 * 100%;
+        top: 296 / 446 * 100%;
+        background: transparent;
+        color: #fff;
+        letter-spacing: 0.1em;
+        border: none;
+        margin: 0;
+        padding: 0;
+        cursor: pointer;
+        outline: none;
+
+        &:hover {
+          color: #a6d942;
+        }
+      }
+    }
+
+    @media (max-width: 1120px) {
+      padding-top: 471 /1120 * 100%;
+      background-size: contain;
+
+      .section-name {
+        right: 25 / 1120 * 100%;
+        top: -35 / 471 * 100%;
+      }
+
+      .accounts-fg {
+        padding-top: 446 / 1120 * 100%;
+        top: 30 / 471 * 100%;
+      }
+    }
+  }
+
+  .era-warning {
+
+    overflow: hidden;
+    max-width: 999px;
+    padding-bottom: 80px;
+    margin: 0 auto 45px;
+    background: url("/img/attention.png") bottom center no-repeat;
+
+    h1 {
+      color: #a6d942;
+      font-size: 60px;
+      letter-spacing: 0.1em;
+      text-align: left;
+      font-weight: bold;
+      margin-top: 0;
+      margin-bottom: 25px;
+    }
+
+    .right-part {
+      width: 500px;
+      float: right;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+
+      span {
+        display: block;
+        text-align: center;
+        line-height: 26px;
+        letter-spacing: 0.1em;
+        margin-bottom: 20px;
+      }
+
+      &>div {
+        display: flex;
+        align-items: flex-start;
+      }
+
+      input {
+        outline: 0;
+        border: none;
+        width: 450px;
+        background: #e8ebf0;
+        padding: 10px 15px;
+        font-size: 16px;
+        letter-spacing: 0.1em;
+        cursor: pointer;
+      }
+
+      .question-mark-btn {
+        border: none;
+        outline: none;
+        background: url("/img/question-mark.png");
+        width: 19px;
+        height: 19px;
+        cursor: pointer;
+        display: inline-block;
+        margin-left: 10px;
+        margin-top: -5px;
+
+        &:hover {
+          opacity: 0.75;
+        }
+      }
+    }
+
+    &::after {
+      content: '';
+      clear: both;
+    }
+  }
+
+  .ta-center {
+    text-align: center;
+    margin-bottom: 100px;
+    letter-spacing: 0.1em;
+    line-height: 26px;
+  }
+
+  .short-hr {
+    width: 77px;
+    border: none;
+    border-bottom: 2px solid #e0e2e7;
+  }
+
+  @media (max-width: 1000px) {
+    .container-950 {
+      padding: 0 15px;
+
+      .exchange-form {
+        padding: 0;
+      }
+    }
+  }
 }

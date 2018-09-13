@@ -20,6 +20,10 @@ class AboutUs extends React.Component {
     })
   }
 
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.resizeText);
+  }
+
   resizeText() {
     if (!this.container.current) {
       return;

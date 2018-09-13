@@ -1,8 +1,9 @@
 import React from 'react';
+import {view} from 'react-easy-state';
 import {i18n} from "../../i18n";
 import './Footer.scss';
 
-export default class Footer extends React.Component {
+class Footer extends React.Component {
   render() {
     let year = '';
     const currYear = (new Date()).getFullYear();
@@ -17,8 +18,8 @@ export default class Footer extends React.Component {
           ©HI-TECH SERVICES LIMITED, 2018{year}
         </span>
         <nav className="footer-menu">
-          <a href="/">{i18n.t('footer.privacyPolicy')}</a>
-          <a href="/">{i18n.t('footer.termsOfUse')}</a>
+          <a href={`/locales/${i18n.lang}/privacy_policy.pdf`}>{i18n.t('footer.privacyPolicy')}</a>
+          <a href={`/locales/${i18n.lang}/terms_of_use.pdf`}>{i18n.t('footer.termsOfUse')}</a>
         </nav>
         <nav className="footer-social">
           <a href="/" className="facebook">Facebook</a>
@@ -29,3 +30,5 @@ export default class Footer extends React.Component {
     </footer>;
   }
 }
+
+export default view(Footer);

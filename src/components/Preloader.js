@@ -25,6 +25,12 @@ class P extends React.Component {
           "swap-arrow-hover.png",
           "telegram.png",
           "twitter.png",
+          "logo.png",
+          "checkbox-disabled.png",
+          "checkbox-enabled.png",
+          "lightbox-arrow-left.png",
+          "lightbox-arrow-right.png",
+          "lightbox-close.png"
         ],
         fonts: [
           {
@@ -127,6 +133,22 @@ class P extends React.Component {
           "index-logo.png",
           "rates-bg.png"
         ]
+      },
+      exchange: {
+        images: [
+          "accounts-bg.png",
+          "accounts-fg.png",
+          "attention.png",
+          "question-mark.png"
+        ]
+      },
+      payments: {
+        images: [
+          "payment-confirmed.png",
+          "payment-pending.png",
+          "search-active.png",
+          "search-inactive.png"
+        ]
       }
     };
     this.performLoad = this.performLoad.bind(this);
@@ -215,7 +237,7 @@ class P extends React.Component {
     if (this.state.loaded && i18n.loaded) {
       document.title = i18n.t('windowTitle');
       document.documentElement.lang = i18n.lang;
-      return <div lang={i18n.lang}>{this.props.children}</div>;
+      return this.props.children;
     } else {
       return <div style={{display: "flex", width: "100vw", height: "100vh", justifyContent: "center", alignItems: "center"}}>
         <Loader/>
@@ -230,9 +252,11 @@ export default Preloader;
 
 export class PreloaderRoute extends React.Component {
   render() {
-    const { bundles, ...rest } = this.props;
-    return <Preloader bundles={bundles} >
-      <Route {...rest} />
-    </Preloader>
+    const { bundles, component: Component, ...rest } = this.props;
+    return <Route {...rest} render={matchProps =>
+      <Preloader bundles={bundles} >
+        <Component {...rest} />
+      </Preloader>
+    }/>
   }
 }

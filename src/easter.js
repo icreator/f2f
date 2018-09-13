@@ -1,7 +1,6 @@
 import 'console.image';
 
 (async () => {
-  console.image('http://localhost:3000/img/loader.png', 1);
   setTimeout(() => {
     console.log('%cWelcome to Face2Face.', 'font-size: 15px;');
     console.log('%cCode by Alexey Ermolaev (http://dotterian.ru)', 'font-size: 10px;');

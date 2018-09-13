@@ -9,6 +9,7 @@ import AboutUs from "./AboutUs/AboutUs";
 import Rates from "./Rates/Rates";
 import Popup from "../../Popup/Popup";
 import './IndexPage.scss';
+import {Link} from "react-router-dom";
 
 class IndexPage extends React.Component {
   constructor(props) {
@@ -23,6 +24,16 @@ class IndexPage extends React.Component {
     this.setState({
       popup: true
     });
+  }
+
+  componentDidMount() {
+    console.log(this.props);
+    if (this.props.location.hash) {
+      console.log(this.props.location.hash);
+      document.querySelector(this.props.location.hash).scrollIntoView({
+        behavior: 'smooth'
+      });
+    }
   }
 
   render() {
@@ -54,7 +65,7 @@ class IndexPage extends React.Component {
           availableAmountOut: 0.03864958
         })}</p>
         <p>{i18n.t('limitExceededPopup.text2')}</p>
-        <Button onClick={() => this.setState({popup: false})}>{i18n.t('limitExceededPopup.btn')}</Button>
+        <Link to="/exchange" className="btn">{i18n.t('limitExceededPopup.btn')}</Link>
       </Popup>
     </div>)
   }

@@ -37,8 +37,9 @@ export default class Menu extends React.Component {
 
     if (this.props.main) {
       onClick = () => {
-        const element = document.querySelector('#about-us');
-        element.scrollIntoView();
+        document.querySelector('#about-us').scrollIntoView({
+          behavior: 'smooth'
+        });
       }
     }
 

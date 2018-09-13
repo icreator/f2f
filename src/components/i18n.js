@@ -12,12 +12,18 @@ export const i18n = store({
   setLanguage: (lang) => {
     i18n.lang = lang;
     localStorage.setItem(i18n.storageKey, lang);
-    i18n.preloadTranslation()
+    //i18n.preloadTranslation()
   },
   loadLangs: async () => {
-    const langs = await await fetch(`/locales.json?v=${process.env.BUILD_TIME}`)
+    const langs = await fetch(`/locales/locales.json?v=${process.env.BUILD_TIME}`)
       .then(result => result.json());
     let lang = null;
+    const translations = {};
+
+    for (let langCode in langs) {
+      translations[langCode] = await fetch(`/locales/${langCode}/translation.json?v=${process.env.BUILD_TIME}`)
+        .then(result => result.json());
+    }
 
     const detectBrowserLanguage = () =>
       (navigator.languages && navigator.languages[0]) ||
@@ -36,28 +42,17 @@ export const i18n = store({
     }
     i18n.langs = langs;
     i18n.lang = lang;
+    i18n.translations = translations;
     document.documentElement.lang = lang;
     localStorage.setItem(i18n.storageKey, lang);
   },
   preloadTranslation: async () => {
     if (!i18n.translations.hasOwnProperty(i18n.lang)) {
       i18n.loaded = false;
-      i18n.translations[i18n.lang] = await fetch(`/locales/${i18n.lang}.json?v=${process.env.BUILD_TIME}`)
+      i18n.translations[i18n.lang] = await fetch(`/locales/${i18n.lang}/translation.json?v=${process.env.BUILD_TIME}`)
         .then(result => result.json());
     }
     i18n.loaded = true;
-  },
-  ordinal: () => {
-    let string = '';
-    switch (i18n.lang) {
-      case 'en':
-        break;
-      case 'ru':
-        break;
-      default:
-        break;
-    }
-    return string;
   },
   t: (string, variables) => {
     let translatedString = string;
@@ -68,22 +63,18 @@ export const i18n = store({
       }
     }
     if (variables) {
+      translatedString = translatedString.split(/({\w+})/);
       for (let variable in variables) {
         if (variables.hasOwnProperty(variable)) {
           const value = variables[variable];
-          translatedString = translatedString.replace(`{${variable}}`, value);
+          translatedString = translatedString.map(current => {
+            if (current === `{${variable}}`) {
+              return value;
+            }
+            return current;
+          });
         }
       }
-    }
-    const ordinalRegex = /{([^|}]+)\|([^|}]+)\|([^|}]+)\|?([^|}]+)?}/;
-    let m = ordinalRegex.exec(translatedString);
-    while (m !== null) {
-      if (m.index === ordinalRegex.lastIndex) {
-        ordinalRegex.lastIndex++;
-      }
-
-      console.log(m);
-      m = ordinalRegex.exec(translatedString);
     }
     return translatedString;
   }

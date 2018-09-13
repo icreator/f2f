@@ -1,0 +1,102 @@
+{
+  "windowTitle": "Face2Face",
+  "logo": {
+    "alt": "Face2Face Logo"
+  },
+  "menu": {
+    "about": "about",
+    "payments": "payments",
+    "support": "support"
+  },
+  "calculator": {
+    "exchange": "exchange",
+    "receive": "receive",
+    "btn": "Exchange"
+  },
+  "rates": {
+    "header": "Exchange Rate"
+  },
+  "footer": {
+    "privacyPolicy": "Privacy Policy",
+    "termsOfUse": "Terms of use"
+  },
+  "about": [
+    {
+      "header": "Convenient.",
+      "text": "For exchange we don't require neither login nor password and none of your personal data"
+    },
+    {
+      "header": "Profitable.",
+      "text": "We guarantee a special rate for the exchange of the amount 1 BTC and more"
+    },
+    {
+      "header": "Low commission.",
+      "text": "The exchange doesn't charge commission for buying/selling BTC, you pay only the network fee"
+    },
+    {
+      "header": "Trustworthy.",
+      "text": "The service works directly with blockchain wallets and doesn't keep your funds"
+    }
+  ],
+  "limitExceededPopup": {
+    "header": "Exceeded the limit of available funds {currency}",
+    "text1": "We apologize for any inconvinience. Now is available {availableAmountIn} {currencyIn} = {availableAmountOut} {currencyOut}",
+    "text2": "You can place an order and the number of tokens you need will be automatically transferred to your account as the funds appear on the service.",
+    "btn": "Order"
+  },
+  "exchange": {
+    "header": {
+      "exchange": "Exchange",
+      "order": "Ordering"
+    },
+    "rateInfo": {
+      "rate": "Exchange rate",
+      "commission": "Fee included",
+      "available": "Available balance",
+      "debt": "Remaining debt"
+    },
+    "checkboxes": {
+      "order": "I understand the application for an exchange will be executed when a sufficient amount of funds appears on the service and the exchange rate will be taken at the moment of execution",
+      "licenses": "I've read and agree to the \"Face to Face\" {terms_of_use_link} and {privacy_policy_link}",
+      "privacy_policy_link": "Privacy Policy",
+      "terms_of_use_link": "Terms of Use"
+    },
+    "accounts": {
+      "header": "Accounts",
+      "in_label": "Enter the account number to receive {currency}",
+      "wrong_account": "invalid account number",
+      "next": "Next",
+      "out_label": "Transfer {currency} to this account",
+      "qr_code": "QR-code",
+      "click_to_copy": "Click to copy account number",
+      "wallet_copied": "Account number copied to your clipboard"
+    },
+    "era_warning": {
+      "header": "ATTENTION!",
+      "text": "Copy the number and paste it into the comment box in the Erachain wallet when sending ERA/Compu",
+      "click_to_copy": "Click to copy this message",
+      "wallet_copied": "Transfer message copied to your clipboard"
+    },
+    "success": {
+      "message": [
+        "Your order is processed.",
+        "The exchange rate will be fixed for 30 minutes to confirm the transaction in the blockchain.",
+        "You can check the operation by the account number in the payment list"
+      ],
+      "payments_button": "Payment details"
+    }
+  },
+  "payments_page": {
+    "header": "Payment details",
+    "search_placeholder": "enter your account number",
+    "nothing_found": "No payments for this account",
+    "table": {
+      "date": "Date",
+      "sent": "Sent",
+      "rate": "Rate",
+      "received": "Received",
+      "block_explorer_link": "Block explorer",
+      "show_more": "Show more"
+    }
+  }
+}

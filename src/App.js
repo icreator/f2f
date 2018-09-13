@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
 import { BrowserRouter as Router, Switch } from 'react-router-dom';
+import { hot } from 'react-hot-loader';
 import { PreloaderRoute } from "./components/Preloader";
 import DefaultLayout from './components/layout/DefaultLayout';
 import IndexPage from "./components/pages/IndexPage/IndexPage";
 import ExchangePage from './components/pages/ExchangePage/ExchangePage';
-import PaymentsPage from "./components/pages/PaymentsPage";
+import PaymentsPage from "./components/pages/PaymentsPage/PaymentsPage";
 import FAQPage from './components/pages/FAQPage';
 import './App.scss';
 
@@ -25,4 +26,4 @@ class App extends Component {
   }
 }
 
-export default App;
+export default hot(module)(App);

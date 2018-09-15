@@ -1,13 +1,13 @@
 import React from 'react';
 import {view} from 'react-easy-state';
-import {i18n} from "../../i18n";
-import ExchangeForm from "../../ExchangeForm/ExchangeForm";
-import './ExchangePage.scss';
-import Popup from "../../Popup/Popup";
-import Button from "../../base/Button";
-import QRCode from "../../QRCode";
 import {Link} from "react-router-dom";
-import Lightbox from "../../Lightbox/Lightbox";
+import {i18n} from "../../state/i18n";
+import ExchangeForm from "../../components/ExchangeForm/ExchangeForm";
+import Popup from "../../components/Popup/Popup";
+import Button from "../../components/Button/Button";
+import QRCode from "../../components/QRCode";
+import Lightbox from "../../components/Lightbox/Lightbox";
+import './ExchangePage.scss';
 
 class ExchangePage extends React.Component {
   constructor(props) {

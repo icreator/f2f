@@ -1,5 +1,5 @@
 import React from 'react';
-import {i18n} from "../i18n";
+import {i18n} from "../../state/i18n";
 import "./CurrencySelector.scss";
 
 class CurrencySelector extends React.Component {

@@ -98,5 +98,25 @@
       "block_explorer_link": "Block explorer",
       "show_more": "Show more"
     }
+  },
+  "supportPage": {
+    "tabs": [
+      {
+        "title": "How to exchange cryptocurrency?",
+        "text": "<p>For example you want to exchange ETH to BTC.</p><p>1. On the main page of the website in a special form select the currency you want to exchange (ETH) from the list and enter it's amount.<br/>2. Select the currency you want to receive (BTC). The exchange will automatically calculate the amount you will recieve.<br/>3. To process an exchange request click the \"Exchange\" button.<br/>4. On the exchange registration page you will see the information about the course and the commission.<br/>5. In order for the application to get into the work read and agree with the Privacy Policy and Terms of Use.<br/>6. After agreeing with the mentioned documents the account number of the exchange will appear to which you must transfer ETH, and the field in which you need to enter your account number to receive the BTC is will be unlocked.</p><p>The application will be automatically executed after the incoming to the Face to Face account of the tokens that you want to exchange.</p>"
+      },
+      {
+        "title": "How long does it take to transfer funds?",
+        "text": "In case the requested volume of tokens exceeded the available amount of funds on the exchanger, the application will be executed upon appearance of sufficient quantity of cryptocurrency on the service. The funds will be automatically transferred to your account at the rate at the time of execution of the application."
+      }
+    ],
+    "email": {
+      "header": "Contact",
+      "name": "Name",
+      "email": "E-mail",
+      "message": "Message",
+      "send": "Send message",
+      "success": "Thank you. Your email has been sucessfully sent."
+    }
   }
 }

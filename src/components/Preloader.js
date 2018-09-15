@@ -2,7 +2,7 @@ import React from 'react';
 import {Route} from "react-router";
 import {view} from 'react-easy-state';
 import Loader from "./Loader";
-import {i18n} from './i18n';
+import {i18n} from '../state/i18n';
 
 class P extends React.Component {
   constructor(props) {
@@ -148,6 +148,13 @@ class P extends React.Component {
           "payment-pending.png",
           "search-active.png",
           "search-inactive.png"
+        ]
+      },
+      support: {
+        images: [
+          'faq-arrow.png',
+          'faq-border.png',
+          'contacts-bg.png'
         ]
       }
     };

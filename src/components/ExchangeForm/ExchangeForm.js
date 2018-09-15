@@ -1,7 +1,7 @@
 import React from 'react';
-import {i18n} from "../i18n";
+import {i18n} from "../../state/i18n";
+import CurrencySelector from "../CurrencySelector/CurrencySelector";
 import './ExchangeForm.scss';
-import CurrencySelector from "../base/CurrencySelector";
 
 class ExchangeForm extends React.Component {
   constructor(props) {

@@ -1,8 +1,8 @@
 import React from 'react';
+import {Route} from "react-router";
+import Preloader from "../components/Preloader";
 import Header from './header/Header';
 import Footer from './footer/Footer';
-import Preloader from "../Preloader";
-import {Route} from "react-router";
 import './DefaultLayout.scss';
 
 export default class DefaultLayout extends React.Component {

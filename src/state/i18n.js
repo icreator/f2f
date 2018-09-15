@@ -1,7 +1,7 @@
 import React from 'react';
 import { store, view } from 'react-easy-state';
 import * as jsonpath from "jsonpath";
-import Loader from "./Loader";
+import Loader from "../components/Loader";
 
 export const i18n = store({
   lang: 'en',

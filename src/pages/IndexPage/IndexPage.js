@@ -1,15 +1,15 @@
 import React from 'react';
 import {view} from 'react-easy-state';
-import { i18n } from '../../i18n';
+import {Link} from "react-router-dom";
+import { i18n } from '../../state/i18n';
 import Footer from '../../layout/footer/Footer';
-import Button from '../../base/Button';
-import ExchangeForm from '../../ExchangeForm/ExchangeForm';
+import Button from '../../components/Button/Button';
+import ExchangeForm from '../../components/ExchangeForm/ExchangeForm';
 import Header from "../../layout/header/Header";
 import AboutUs from "./AboutUs/AboutUs";
 import Rates from "./Rates/Rates";
-import Popup from "../../Popup/Popup";
+import Popup from "../../components/Popup/Popup";
 import './IndexPage.scss';
-import {Link} from "react-router-dom";
 
 class IndexPage extends React.Component {
   constructor(props) {

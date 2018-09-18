@@ -1,7 +1,9 @@
 .currency-selector-container {
   position: relative;
 
-  img {
+  .currency-icon {
+    width: 32px;
+    height: 32px;
     margin-right: 15px;
   }
 

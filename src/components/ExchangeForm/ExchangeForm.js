@@ -1,122 +1,197 @@
 import React from 'react';
 import {i18n} from "../../state/i18n";
+import state from '../../state/state';
+import {fetch} from 'whatwg-fetch';
+import {view} from 'react-easy-state';
+import AbortController from '../../libs/abort-controller';
 import CurrencySelector from "../CurrencySelector/CurrencySelector";
 import './ExchangeForm.scss';
+import CurrencyInput from "../CurrencyInput/CurrencyInput";
+
+const abortableFetch = ('signal' in new Request('')) ? window.fetch : fetch
 
 class ExchangeForm extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      amountIn: 0,
-      amountOut: 0,
-      rate: 20,
-      in: {
-        code: 'era',
-        icon_light: '/img/currencies/era.png',
-        icon_dark: '/img/currencies/era.png',
-        name: 'Erachain (ERA)'
-      },
-      out: {
-        code: 'compu',
-        icon_light: '/img/currencies/compu.png',
-        icon_dark: '/img/currencies/compu.png',
-        name: 'Erachain (Compu)'
-      },
+      rate: '',
       lastInput: 'in',
-      rates: {
-        era_compu: 20,
-        compu_era: 1 / 20,
-        btc_era: 50,
-        era_btc: 1 / 50,
-        btc_compu: 1000,
-        compu_btc: 1/1000,
-        era_era: 1,
-        compu_compu: 1,
-        btc_btc: 1
-      }
+      rates: {},
+      in_loading: false,
+      out_loading: false,
+      out_error: false
     };
-    this.setIn = this.setIn.bind(this);
-    this.setOut = this.setOut.bind(this);
-    this.setInAmount = this.setInAmount.bind(this);
-    this.setOutAmount = this.setOutAmount.bind(this);
-    this.swap = this.swap.bind(this);
+    if (state.calculator.in.name === undefined) {
+      state.calculator.in = state.currencies.in.COMPU;
+    }
+    if (state.calculator.out.name === undefined) {
+      state.calculator.out = state.currencies.out.BTC;
+    }
   }
 
-  setInAmount(event) {
-    const value = event.target.value;
-    const rate = this.state.rates[`${this.state.in.code}_${this.state.out.code}`];
+  setInAmount = (event) => {
+    const amountIn = event.target.value;
+    const {in: curr_in, out: curr_out} = state.calculator;
+    state.calculator.amountIn = amountIn;
+    state.calculator.usdValue = amountIn * state.getRate('usd', curr_in.id);
     this.setState({
       lastInput: 'in',
-      amountIn: value,
-      amountOut: value * rate
+      out_loading: true,
+      out_error: false
     });
-  }
-
-  setOutAmount(event) {
-    const value = event.target.value;
-    const rate = this.state.rates[`${this.state.out.code}_${this.state.in.code}`];
-    this.setState({
-      lastInput: 'out',
-      amountIn: value * rate,
-      amountOut: value
-    });
-  }
-
-  setIn(value) {
-    if (this.state.lastInput === 'in') {
-      const rate = this.state.rates[`${value.code}_${this.state.out.code}`];
-      this.setState({
-        in: value,
-        amountOut: this.state.amountIn * rate
+    this.loadRate(curr_in.id, curr_out.id, amountIn)
+      .then(r => {
+        state.calculator.amountOut = r.volume_out;
+        state.calculator.rate = r.rate;
+        this.setState({
+          out_loading: false,
+        });
+      }, e => {
+        if (e.name !== "AbortError") {
+          this.setState({
+            out_error: true
+          })
+        }
       });
-    } else {
-      const rate = this.state.rates[`${this.state.out.code}_${value.code}`];
-      this.setState({
-        in: value,
-        amountIn: this.state.amountOut * rate
-      });
-    }
-  }
+  };
 
-  setOut(value) {
-    if (this.state.lastInput === 'in') {
-      const rate = this.state.rates[`${this.state.in.code}_${value.code}`];
-      this.setState({
-        out: value,
-        amountOut: this.state.amountIn * rate
-      })
-    } else {
-      const rate = this.state.rates[`${value.code}_${this.state.in.code}`];
-      this.setState({
-        out: value,
-        amountIn: this.state.amountOut * rate
-      })
-    }
-  }
+  // setOutAmount = (event) => {
+  //   const value = event.target.value;
+  //   const rate = this.state.rates[`${this.state.out.code}_${this.state.in.code}`];
+  //   this.setState({
+  //     lastInput: 'out',
+  //     amountIn: value * rate,
+  //     amountOut: value
+  //   });
+  // };
 
-  swap() {
+  setIn = (curr_in) => {
+    // if (this.state.lastInput === 'in') {
+    const {out, amountIn} = state.calculator;
+    state.calculator.in = curr_in;
+    state.calculator.usdValue = amountIn * state.getRate('usd', curr_in.id);
     this.setState({
-      in: this.state.out,
-      out: this.state.in,
-      amountIn: this.state.amountOut,
-      amountOut: this.state.amountIn
+      out_loading: true,
+      out_error: false
     });
-  }
+    this.loadRate(curr_in.id, out.id, amountIn)
+      .then(r => {
+        state.calculator.rate = r.rate;
+        state.calculator.amountOut = r.volume_out;
+        this.setState({
+          out_loading: false
+        })
+      }, e => {
+        if (e.name !== "AbortError") {
+          this.setState({
+            out_error: true
+          })
+        }
+      });
+    // } else {
+    //   const rate = this.state.rates[`${this.state.out.code}_${value.code}`];
+    //   this.setState({
+    //     in: value,
+    //     amountIn: this.state.amountOut * rate
+    //   });
+    // }
+  };
+
+  setOut = (out) => {
+    // if (this.state.lastInput === 'in') {
+    const {in: curr_in, amountIn} = state.calculator;
+    state.calculator.out = out;
+    this.setState({
+      out_loading: true,
+      out_error: false
+    });
+    this.loadRate(curr_in.id, out.id, amountIn)
+      .then(r => {
+        state.calculator.rate = r.rate;
+        state.calculator.amountOut = r.volume_out;
+        this.setState({
+          out_loading: false,
+        })
+      }, e => {
+        if (e.name !== "AbortError") {
+          this.setState({
+            out_error: true
+          })
+        }
+      });
+    // } else {
+    //   const rate = this.state.rates[`${value.code}_${this.state.in.code}`];
+    //   this.setState({
+    //     out: value,
+    //     amountIn: this.state.amountOut * rate
+    //   })
+    // }
+  };
+
+  swap = () => {
+    const {in: curr_out, out: curr_in, amountOut: amountIn} = state.calculator;
+    state.calculator.in = curr_in;
+    state.calculator.out = curr_out;
+    state.calculator.amountIn = amountIn;
+    state.calculator.usdValue = amountIn * state.getRate('usd', curr_in.id);
+    this.setState({
+      out_loading: true,
+      out_error: false
+    });
+    this.loadRate(curr_in.id, curr_out.id, amountIn)
+      .then(r => {
+        state.calculator.amountOut = r.volume_out;
+        state.calculator.rate = r.rate;
+        this.setState({
+          out_loading: false
+        })
+      }, e => {
+        if (e.name !== "AbortError") {
+          this.setState({
+            out_error: true
+          })
+        }
+      });
+  };
+
+  loadRate = (curr_in, curr_out, amount) => {
+    // eslint-disable-next-line eqeqeq
+    if (amount == 0) {
+      return new Promise(resolve => resolve({
+        volume_out: 0,
+        rate: 0
+      }));
+    }
+    let signal;
+    if (this.abortController !== undefined) {
+      this.abortController.abort();
+    }
+    this.abortController = new AbortController();
+    signal = this.abortController.signal;
+    return abortableFetch(`${state.serverName}/apipay/get_rate.json/${curr_in}/${curr_out}/${amount}`, {
+      signal
+    })
+      .then(r => r.json());
+  };
 
   render() {
-    const { amountIn, amountOut } = this.state;
-    const currencies = [
-      {code: 'era', icon_light: '/img/currencies/era.png', icon_dark: '/img/currencies/era.png', name: 'Erachain (ERA)'},
-      {code: 'compu', icon_light: 'img/currencies/compu.png', icon_dark: '/img/currencies/compu.png', name: 'Erachain (Compu)'},
-      {code: 'btc', icon_light: '/img/currencies/btc-light.png', icon_dark: '/img/currencies/btc-dark.png', name: 'Bitcoin (BTC)'}
-    ];
+    const {
+      amountIn,
+      amountOut,
+      in: curr_in,
+      out: curr_out,
+      usdValue,
+      rate
+    } = state.calculator;
     return <div className="exchange-form">
       <div className="column">
-        <CurrencySelector value={this.state.in} onChange={this.setIn} data={currencies}/>
+        <CurrencySelector value={curr_in} onChange={this.setIn} data={state.currencies.in}/>
         <label>{i18n.t('calculator.exchange')}</label>
-        <input value={amountIn} onInput={this.setInAmount}/>
+        <CurrencyInput value={amountIn} onInput={this.setInAmount} loading={this.state.in_loading}/>
         <div className="in-usd">
-          <span>$0</span>
+          <span>${usdValue.toLocaleString(i18n.t('intl'), {
+            minimumFractionDigits: 2
+          })}</span>
           <span>USD</span>
         </div>
       </div>
@@ -124,16 +199,21 @@ class ExchangeForm extends React.Component {
         <a onClick={this.swap}>{i18n.t('calculator.swap')}</a>
       </div>
       <div className="column">
-        <CurrencySelector value={this.state.out} onChange={this.setOut} data={currencies} />
+        <CurrencySelector value={curr_out} onChange={this.setOut} data={state.currencies.out}/>
         <label>{i18n.t('calculator.receive')}</label>
-        <input value={amountOut} onInput={this.setOutAmount}/>
+        <CurrencyInput
+          value={amountOut}
+          onInput={this.setOutAmount}
+          loading={this.state.out_loading}
+          error={this.state.out_error}
+        />
         <div className="in-usd">
-          <span>$0</span>
-          <span>USD</span>
+          <span>{i18n.t('calculator.rate')}</span>
+          <span>{rate}</span>
         </div>
       </div>
     </div>
   }
 }
 
-export default ExchangeForm;
+export default view(ExchangeForm);

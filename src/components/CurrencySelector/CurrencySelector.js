@@ -1,5 +1,6 @@
 import React from 'react';
 import {i18n} from "../../state/i18n";
+import state from '../../state/state';
 import "./CurrencySelector.scss";
 
 class CurrencySelector extends React.Component {
@@ -7,11 +8,9 @@ class CurrencySelector extends React.Component {
     super(props);
     this.state = {
       dropdown: false,
-      current: this.props.value.code
+      current: this.props.value.id
     };
     this.dropdown = React.createRef();
-    this.handleClickOutside = this.handleClickOutside.bind(this);
-    this.setValue = this.setValue.bind(this);
   }
 
   componentDidMount() {
@@ -22,21 +21,21 @@ class CurrencySelector extends React.Component {
     document.removeEventListener('mousedown', this.handleClickOutside);
   }
 
-  handleClickOutside(event) {
+  handleClickOutside = (event) => {
     if (this.dropdown.current && !this.dropdown.current.contains(event.target)) {
       this.setState({
         dropdown: false,
-        current: this.props.value.code
+        current: this.props.value.id
       });
     }
-  }
+  };
 
-  setValue(currency) {
+  setValue = (currency) => {
     this.setState({
       dropdown: false,
     });
     this.props.onChange(currency);
-  }
+  };
 
   render() {
     let dropdown = '';
@@ -46,17 +45,18 @@ class CurrencySelector extends React.Component {
     if (this.state.dropdown) {
       dropdown = [];
       fieldClass += " active";
-      for (let currency of this.props.data) {
-        let className = currency.code === this.state.current?'current':'';
+      for (let code in this.props.data) {
+        let currency = this.props.data[code];
+        let className = currency.id === this.state.current?'current':'';
         dropdown.push(<li
           key={currency.name}
           className={className}
           onClick={() => this.setValue(currency)}
           onMouseOver={() => this.setState({
-            current: currency.code
+            current: currency.id
           })}
         >
-          <img alt={currency.code} src={currency.icon_light} className="currency-icon"/> <span className="currency-name">{currency.name}</span>
+          <img alt={code} src={`${state.serverName}${state.icon_url}/${currency.icon}`} className="currency-icon"/> <span className="currency-name">{currency.name}</span>
         </li>)
       }
       dropdown = <ul className="dropdown">
@@ -66,7 +66,7 @@ class CurrencySelector extends React.Component {
 
     if (this.props.value) {
       value = [
-        <img alt={this.props.value.code} key="icon" src={this.props.value.icon_light} className="currencyIcon"/>,
+        <img alt={this.props.value.name} key="icon" src={`${state.serverName}${state.icon_url}/${this.props.value.icon}`} className="currency-icon"/>,
         <span key="name" className="currency-name">{this.props.value.name}</span>
       ];
     }
@@ -74,7 +74,7 @@ class CurrencySelector extends React.Component {
     return <div ref={this.dropdown} className="currency-selector-container">
       <div className={fieldClass} onClick={() => this.setState({
         dropdown: !this.state.dropdown,
-        current: this.props.value.code
+        current: this.props.value.id
       })}>
         {value}
       </div>

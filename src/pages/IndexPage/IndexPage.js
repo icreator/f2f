@@ -1,5 +1,6 @@
 import React from 'react';
 import {view} from 'react-easy-state';
+import {withRouter} from 'react-router';
 import {Link} from "react-router-dom";
 import { i18n } from '../../state/i18n';
 import Footer from '../../layout/footer/Footer';
@@ -9,27 +10,47 @@ import Header from "../../layout/header/Header";
 import AboutUs from "./AboutUs/AboutUs";
 import Rates from "./Rates/Rates";
 import Popup from "../../components/Popup/Popup";
+import state from '../../state/state';
 import './IndexPage.scss';
 
 class IndexPage extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      popup: false
+      popup: false,
+      mayPayPopup: false
     };
     this.exchange = this.exchange.bind(this);
   }
 
   exchange() {
-    this.setState({
-      popup: true
-    });
+    const {amountOut, out: curr_out} = state.calculator;
+    const availableAmountOut = state.getAvailableAmount(curr_out.id);
+    if (amountOut > availableAmountOut) {
+      this.setState({
+        popup: true,
+        availableAmountOut
+      });
+    } else {
+      this.props.history.push('/exchange');
+    }
+  }
+
+  checkMayPay() {
+    const {in: curr_in, amountIn} = state.calculator;
+    const mayPay = state.getMayPay(curr_in.id);
+    if (mayPay !== undefined && amountIn > mayPay) {
+      this.setState({
+        mayPayPopup: true,
+        mayPay
+      });
+    } else {
+      this.exchange();
+    }
   }
 
   componentDidMount() {
-    console.log(this.props);
     if (this.props.location.hash) {
-      console.log(this.props.location.hash);
       document.querySelector(this.props.location.hash).scrollIntoView({
         behavior: 'smooth'
       });
@@ -45,7 +66,7 @@ class IndexPage extends React.Component {
             <img className="logo" src="/img/index-logo.png" alt={i18n.t("logo.alt")} />
             <div className="exchange-form-container">
               <ExchangeForm />
-              <Button onClick={() => this.exchange()} style={{alignSelf: "center", marginTop: "65px"}}>{i18n.t('calculator.btn')}</Button>
+              <Button onClick={() => this.checkMayPay()} style={{alignSelf: "center", marginTop: "65px"}}>{i18n.t('calculator.btn')}</Button>
             </div>
           </div>
         </div>
@@ -57,18 +78,38 @@ class IndexPage extends React.Component {
         open={this.state.popup}
         close={() => this.setState({popup: !this.state.popup})}
       >
-        <h1>{i18n.t('limitExceededPopup.header', {currency: 'ERA'})}</h1>
+        <h1>{i18n.t('limitExceededPopup.header', {currency: state.calculator.out.name})}</h1>
         <p>{i18n.t('limitExceededPopup.text1', {
-          currencyIn: 'ERA',
-          currencyOut: 'BTC',
-          availableAmountIn: 10051.458107,
-          availableAmountOut: 0.03864958
+          currencyIn: state.calculator.in.name,
+          currencyOut: state.calculator.out.name,
+          availableAmountIn: this.state.availableAmountIn,
+          availableAmountOut: this.state.availableAmountOut
         })}</p>
         <p>{i18n.t('limitExceededPopup.text2')}</p>
         <Link to="/exchange" className="btn">{i18n.t('limitExceededPopup.btn')}</Link>
+      </Popup>
+      <Popup
+        open={this.state.mayPayPopup}
+        close={() => this.setState({mayPayPopup: !this.state.mayPayPopup})}
+      >
+        <h1>{i18n.t('maypayExceededPopup.header', {currency: state.calculator.in.name})}</h1>
+        <p>{i18n.t('maypayExceededPopup.text1', {
+          currencyIn: state.calculator.in.name,
+          mayPay: this.state.mayPay
+        })}</p>
+        <p>{i18n.t('maypayExceededPopup.text2', {
+          currencyIn: state.calculator.in.name,
+          currencyOut: state.calculator.out.name
+        })}</p>
+        <Button onClick={() => {
+          this.setState({
+            mayPayPopup: false
+          });
+          this.exchange();
+        }}>{i18n.t('maypayExceededPopup.btn')}</Button>
       </Popup>
     </div>)
   }
 }
 
-export default view(IndexPage);
+export default view(withRouter(IndexPage));

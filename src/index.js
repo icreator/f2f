@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import { BrowserRouter as Router, Switch } from 'react-router-dom';
 import { hot } from 'react-hot-loader';
 import {i18n} from './state/i18n';
+import state from './state/state';
 import { PreloaderRoute } from "./components/Preloader";
 import DefaultLayout from './layout/DefaultLayout';
 import IndexPage from "./pages/IndexPage/IndexPage";
@@ -33,6 +34,7 @@ class App extends React.Component {
 const Application = hot(module)(App);
 
 i18n.loadLangs()
+  .then(() => state.loadCurrencies())
   .then(() => {
     ReactDOM.render(<Application />, document.querySelector('#root'));
   });

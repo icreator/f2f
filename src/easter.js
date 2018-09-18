@@ -3,9 +3,12 @@ import 'console.image';
 (async () => {
   setTimeout(() => {
     console.log('%cWelcome to Face2Face.', 'font-size: 15px;');
-    console.log('%cCode by Alexey Ermolaev (http://dotterian.ru)', 'font-size: 10px;');
   }, 100);
 })();
+
+window.credits = () => {
+  console.log('%cCode by Alexey Ermolaev (http://dotterian.ru)', 'font-size: 10px;');
+}
 
 window.kitty = () => {
   console.log('%cHere\'s some kitty for you:', 'font-size: 15px; font-weight: bold;');

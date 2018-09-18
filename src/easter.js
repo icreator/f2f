@@ -6,9 +6,7 @@ import 'console.image';
   }, 100);
 })();
 
-window.credits = () => {
-  console.log('%cCode by Alexey Ermolaev (http://dotterian.ru)', 'font-size: 10px;');
-}
+window.credits = 'Code by Alexey Ermolaev (http://dotterian.ru)';
 
 window.kitty = () => {
   console.log('%cHere\'s some kitty for you:', 'font-size: 15px; font-weight: bold;');

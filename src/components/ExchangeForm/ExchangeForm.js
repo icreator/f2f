@@ -3,7 +3,7 @@ import {i18n} from "../../state/i18n";
 import state from '../../state/state';
 import {fetch} from 'whatwg-fetch';
 import {view} from 'react-easy-state';
-import AbortController from 'abort-controller';
+import AbortController from '../../libs/abort-controller';
 import CurrencySelector from "../CurrencySelector/CurrencySelector";
 import './ExchangeForm.scss';
 import CurrencyInput from "../CurrencyInput/CurrencyInput";

@@ -342,7 +342,7 @@ class ExchangePage extends React.Component {
         close={() => this.setState({qr: !this.state.qr})}
       >
         <QRCode
-          logo="/img/currencies/btc-light.png"
+          logo={`${state.serverName}${state.icon_url}/${state.calculator.in.icon}`}
           value={`${this.state.qr_uri}`}
         />
       </Popup>

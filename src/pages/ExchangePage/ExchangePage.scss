@@ -83,14 +83,40 @@
       top: 25px;
       left: 0;
 
-      .account-in-label {
+      .address-loader {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+
+        &:after {
+          content: " ";
+          display: block;
+          width: 16px;
+          height: 16px;
+          margin: 1px;
+          border-radius: 50%;
+          border: 2px solid #000;
+          border-color: #000 transparent #000 transparent;
+          animation: lds-dual-ring 1.2s linear infinite;
+        }
+        @keyframes lds-dual-ring {
+          0% {
+            transform: rotate(0deg);
+          }
+          100% {
+            transform: rotate(360deg);
+          }
+        }
+      }
+
+      .account-out-label {
         position: absolute;
         top: 76 / 446 * 100%;
         left: 91 / 1120 * 100%;
         letter-spacing: 0.1em;
       }
 
-      .account-in-input {
+      .account-out-input {
         position: absolute;
         left: 89 / 1120 * 100%;
         top: 109 / 446 * 100%;
@@ -114,7 +140,7 @@
         }
       }
 
-      .account-in-error {
+      .account-out-error {
         position: absolute;
         color: #ff0000;
         top: 171 / 446 * 100%;
@@ -140,7 +166,7 @@
         }
       }
 
-      .account-out-label {
+      .account-in-label {
         position: absolute;
         letter-spacing: 0.1em;
         top: 199 / 446 * 100%;
@@ -148,7 +174,7 @@
         color: #fff;
       }
 
-      .account-out-input {
+      .account-in-input {
         position: absolute;
         left: 620 / 1120 * 100%;
         top: 233 / 446 * 100%;
@@ -182,6 +208,13 @@
 
         &:hover {
           color: #a6d942;
+        }
+
+        .address-loader {
+          &:after {
+            border: 2px solid #fff;
+            border-color: #fff transparent #fff transparent;
+          }
         }
       }
     }

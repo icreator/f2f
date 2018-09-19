@@ -8,7 +8,8 @@ import CurrencySelector from "../CurrencySelector/CurrencySelector";
 import './ExchangeForm.scss';
 import CurrencyInput from "../CurrencyInput/CurrencyInput";
 
-const abortableFetch = ('signal' in new Request('')) ? window.fetch : fetch
+const abortableFetch = ('signal' in new Request('')) ? window.fetch : fetch;
+const abortController = ('AbortController' in window) ? window.AbortController : AbortController;
 
 class ExchangeForm extends React.Component {
   constructor(props) {
@@ -29,20 +30,28 @@ class ExchangeForm extends React.Component {
     }
   }
 
-  setInAmount = (event) => {
-    const amountIn = event.target.value;
-    const {in: curr_in, out: curr_out} = state.calculator;
-    state.calculator.amountIn = amountIn;
-    state.calculator.usdValue = amountIn * state.getRate('usd', curr_in.id);
+  recalculateOutAmount = (curr_in_id, curr_out_id, amountIn) => {
     this.setState({
       lastInput: 'in',
       out_loading: true,
       out_error: false
     });
-    this.loadRate(curr_in.id, curr_out.id, amountIn)
-      .then(r => {
-        state.calculator.amountOut = r.volume_out;
-        state.calculator.rate = r.rate;
+    if (typeof this.props.onChange === 'function') {
+      this.props.onChange();
+    }
+    const availableAmountOut = state.getAvailableAmount(curr_out_id);
+    this.loadRate(curr_in_id, curr_out_id, amountIn)
+      .then(({volume_out: amountOut, rate}) => {
+        let exceeded = false;
+        if (amountOut > availableAmountOut) {
+          exceeded = true;
+        }
+        state.calculator = {
+          ...state.calculator,
+          amountOut,
+          rate,
+          exceeded
+        };
         this.setState({
           out_loading: false,
         });
@@ -50,12 +59,24 @@ class ExchangeForm extends React.Component {
         if (e.name !== "AbortError") {
           this.setState({
             out_error: true
-          })
+          });
+          console.log(e);
         }
       });
   };
 
-  // setOutAmount = (event) => {
+  setInAmount = (event) => {
+    const amountIn = event.target.value;
+    const {in: curr_in, out: curr_out} = state.calculator;
+    state.calculator = {
+      ...state.calculator,
+      amountIn,
+      usdValue: amountIn * state.getRate('usd', curr_in.code),
+    };
+    this.recalculateOutAmount(curr_in.id, curr_out.id, amountIn);
+  };
+
+  setOutAmount = (event) => {
   //   const value = event.target.value;
   //   const rate = this.state.rates[`${this.state.out.code}_${this.state.in.code}`];
   //   this.setState({
@@ -63,31 +84,17 @@ class ExchangeForm extends React.Component {
   //     amountIn: value * rate,
   //     amountOut: value
   //   });
-  // };
+  };
 
   setIn = (curr_in) => {
     // if (this.state.lastInput === 'in') {
     const {out, amountIn} = state.calculator;
-    state.calculator.in = curr_in;
-    state.calculator.usdValue = amountIn * state.getRate('usd', curr_in.id);
-    this.setState({
-      out_loading: true,
-      out_error: false
-    });
-    this.loadRate(curr_in.id, out.id, amountIn)
-      .then(r => {
-        state.calculator.rate = r.rate;
-        state.calculator.amountOut = r.volume_out;
-        this.setState({
-          out_loading: false
-        })
-      }, e => {
-        if (e.name !== "AbortError") {
-          this.setState({
-            out_error: true
-          })
-        }
-      });
+    state.calculator = {
+      ...state.calculator,
+      in: curr_in,
+      usdValue: amountIn * state.getRate('usd', curr_in.code),
+    };
+    this.recalculateOutAmount(curr_in.id, out.id, amountIn);
     // } else {
     //   const rate = this.state.rates[`${this.state.out.code}_${value.code}`];
     //   this.setState({
@@ -100,25 +107,11 @@ class ExchangeForm extends React.Component {
   setOut = (out) => {
     // if (this.state.lastInput === 'in') {
     const {in: curr_in, amountIn} = state.calculator;
-    state.calculator.out = out;
-    this.setState({
-      out_loading: true,
-      out_error: false
-    });
-    this.loadRate(curr_in.id, out.id, amountIn)
-      .then(r => {
-        state.calculator.rate = r.rate;
-        state.calculator.amountOut = r.volume_out;
-        this.setState({
-          out_loading: false,
-        })
-      }, e => {
-        if (e.name !== "AbortError") {
-          this.setState({
-            out_error: true
-          })
-        }
-      });
+    state.calculator = {
+      ...state.calculator,
+      out,
+    };
+    this.recalculateOutAmount(curr_in.id, out.id, amountIn);
     // } else {
     //   const rate = this.state.rates[`${value.code}_${this.state.in.code}`];
     //   this.setState({
@@ -129,32 +122,22 @@ class ExchangeForm extends React.Component {
   };
 
   swap = () => {
-    const {in: curr_out, out: curr_in, amountOut: amountIn} = state.calculator;
-    state.calculator.in = curr_in;
-    state.calculator.out = curr_out;
-    state.calculator.amountIn = amountIn;
-    state.calculator.usdValue = amountIn * state.getRate('usd', curr_in.id);
-    this.setState({
-      out_loading: true,
-      out_error: false
-    });
-    this.loadRate(curr_in.id, curr_out.id, amountIn)
-      .then(r => {
-        state.calculator.amountOut = r.volume_out;
-        state.calculator.rate = r.rate;
-        this.setState({
-          out_loading: false
-        })
-      }, e => {
-        if (e.name !== "AbortError") {
-          this.setState({
-            out_error: true
-          })
-        }
-      });
+    const {in: out, out: curr_in, amountOut: amountIn} = state.calculator;
+    state.calculator = {
+      ...state.calculator,
+      in: curr_in,
+      out,
+      amountIn,
+      usdValue: amountIn * state.getRate('usd', curr_in.code)
+    };
+    this.recalculateOutAmount(curr_in.id, out.id, amountIn);
   };
 
   loadRate = (curr_in, curr_out, amount) => {
+    let signal;
+    if (this.abortController !== undefined) {
+      this.abortController.abort();
+    }
     // eslint-disable-next-line eqeqeq
     if (amount == 0) {
       return new Promise(resolve => resolve({
@@ -162,11 +145,7 @@ class ExchangeForm extends React.Component {
         rate: 0
       }));
     }
-    let signal;
-    if (this.abortController !== undefined) {
-      this.abortController.abort();
-    }
-    this.abortController = new AbortController();
+    this.abortController = new abortController();
     signal = this.abortController.signal;
     return abortableFetch(`${state.serverName}/apipay/get_rate.json/${curr_in}/${curr_out}/${amount}`, {
       signal

@@ -4,6 +4,7 @@
   "logo": {
     "alt": "Face2Face Logo"
   },
+  "continue": "Continue",
   "menu": {
     "about": "about",
     "payments": "payments",
@@ -48,7 +49,7 @@
   },
   "maypayExceededPopup": {
     "header": "Exceeded the limit of {currency}",
-    "text1": "We apologize for any inconvinience. Service can accept only as much as {mayPay} {curencyIn}.",
+    "text1": "We apologize for any inconvinience. Service can accept only as much as {mayPay} {currencyIn}.",
     "text2": "You can place an order and the number of tokens you need will be automatically transferred to your account when the amount of {currencyIn} will decrease and there will be enough {currencyOut} tokens.",
     "btn": "Order"
   },
@@ -71,10 +72,10 @@
     },
     "accounts": {
       "header": "Accounts",
-      "in_label": "Enter the account number to receive {currency}",
+      "out_label": "Enter the account number to receive {currency}",
       "wrong_account": "invalid account number",
       "next": "Next",
-      "out_label": "Transfer {currency} to this account",
+      "in_label": "Transfer {currency} to this account",
       "qr_code": "QR-code",
       "click_to_copy": "Click to copy account number",
       "wallet_copied": "Account number copied to your clipboard"
@@ -92,6 +93,9 @@
         "You can check the operation by the account number in the payment list"
       ],
       "payments_button": "Payment details"
+    },
+    "agreementsPopup": {
+      "header": "Please, confirm that you read and agreed to all terms of transaction."
     }
   },
   "payments_page": {

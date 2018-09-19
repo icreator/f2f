@@ -4,8 +4,9 @@ import './CurrencyInput.scss';
 class CurrencyInput extends React.Component {
   state = {
     animation: '',
-  }
+  };
 
+  lastKey = '';
   animationQueue = [];
 
   addAnimation = (className, timeout) => {
@@ -13,7 +14,7 @@ class CurrencyInput extends React.Component {
     if (this.animationQueue.length === 1) {
       this.processQueue();
     }
-  }
+  };
 
   processQueue = () => {
     if (this.animationQueue.length === 0) {
@@ -24,26 +25,33 @@ class CurrencyInput extends React.Component {
       animation: item[0]
     });
     setTimeout(() => {
-      this.animationQueue.shift()
+      this.animationQueue.shift();
       this.processQueue();
     }, item[1]);
-  }
+  };
 
-  blockNonNumeric = (event) => {
-    if (['+', '-', 'e', ',', ' '].includes(event.key)) {
-      event.preventDefault();
+  onInput = (event) => {
+    const startingValue = event.target.value;
+    event.target.value = event.target.value.replace(/[^0-9.]/g, '');
+    if (/(\d*\.\d*)\.(\d*)/g.exec(event.target.value)) {
+      event.target.value = event.target.value.replace(/(\d*\.\d*)\.(\d*)/gm, '$1$2');
+    }
+    if (/^\.\d*$/g.exec(event.target.value)) {
+      event.target.value = event.target.value.replace(/^\.(\d*)$/g, '0.$1');
+      this.props.onInput(event);
       return;
     }
-    if (['.'].includes(event.key) && (/\./.exec(event.target.value) || event.target.value === '')) {
-      event.preventDefault();
+    if (event.target.value === startingValue) {
+      this.props.onInput(event);
     }
   };
 
   componentDidUpdate(prevProps, prevState) {
+    if (this.props.loading && this.animationQueue.length === 0) {
+      this.addAnimation('in', 310);
+    }
     if (prevProps.loading !== this.props.loading) {
-      if (this.props.loading && this.state.animation === '') {
-        this.addAnimation('in', 310);
-      } else if (!this.props.loading && this.state.animation === 'in') {
+      if (!this.props.loading && this.state.animation === 'in') {
         this.addAnimation('out', 310);
         this.addAnimation('', 0);
       }
@@ -53,12 +61,13 @@ class CurrencyInput extends React.Component {
   render() {
     return <div className="currency-input">
       <input
-        type="number"
+        placeholder='0'
         value={this.props.value}
-        onKeyDown={this.blockNonNumeric}
-        onKeyUp={this.drawZero}
-        onInput={this.props.onInput}/>
+        onInput={this.onInput}
+        onChange={() => {}} // Get rid of this pesky react warning in console!
+      />
       <div className={`curtain ${this.state.animation}${this.props.error?' error':''}`}/>
+      <span>{this.lastKey}</span>
     </div>;
   }
 }

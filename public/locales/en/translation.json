@@ -4,6 +4,10 @@
   "logo": {
     "alt": "Face2Face Logo"
   },
+  "404": {
+    "header": "Page not found",
+    "returnToHome": "Return to main page"
+  },
   "continue": "Continue",
   "menu": {
     "about": "about",

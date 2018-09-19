@@ -10,6 +10,7 @@ import IndexPage from "./pages/IndexPage/IndexPage";
 import ExchangePage from './pages/ExchangePage/ExchangePage';
 import PaymentsPage from "./pages/PaymentsPage/PaymentsPage";
 import SupportPage from './pages/SupportPage/SupportPage';
+import ErrorPage from './pages/ErrorPage/ErrorPage';
 import './easter.js';
 import './index.scss';
 
@@ -19,12 +20,11 @@ class App extends React.Component {
     return (
       <Router basename={process.env.PUBLIC_URL} onUpdate={() => window.scrollTo(0,0)}>
         <Switch>
-          <PreloaderRoute exact path="/" bundles={["index", "currencies"]} component={IndexPage}/>
-          <DefaultLayout bundles={["exchange", "currencies"]} path="/exchange/:currency1/:currency2/:amount" component={ExchangePage}/>
-          <DefaultLayout bundles={["exchange", "currencies"]} path="/exchange/:currency1/:currency2" component={ExchangePage}/>
-          <DefaultLayout bundles={["exchange", "currencies"]} path="/exchange" component={ExchangePage}/>
+          <PreloaderRoute exact path="/" bundles={["index"]} component={IndexPage}/>
+          <DefaultLayout bundles={["exchange"]} path="/exchange" component={ExchangePage}/>
           <DefaultLayout bundles={["support"]} path="/support" component={SupportPage}/>
           <DefaultLayout bundles={["payments"]} path="/payments" component={PaymentsPage}/>
+          <PreloaderRoute path="*" bundles={['index']} component={ErrorPage}/>
         </Switch>
       </Router>
     );

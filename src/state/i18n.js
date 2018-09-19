@@ -15,13 +15,13 @@ export const i18n = store({
     //i18n.preloadTranslation()
   },
   loadLangs: async () => {
-    const langs = await fetch(`/locales/locales.json?v=${process.env.BUILD_TIME}`)
+    const langs = await fetch(`/locales/locales.json?v=${process.env.REACT_APP_BUILD_TIME}`)
       .then(result => result.json());
     let lang = null;
     const translations = {};
 
     for (let langCode in langs) {
-      translations[langCode] = await fetch(`/locales/${langCode}/translation.json?v=${process.env.BUILD_TIME}`)
+      translations[langCode] = await fetch(`/locales/${langCode}/translation.json?v=${process.env.REACT_APP_BUILD_TIME}`)
         .then(result => result.json());
     }
 

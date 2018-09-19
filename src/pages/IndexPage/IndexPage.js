@@ -31,6 +31,7 @@ class IndexPage extends React.Component {
         popup: true,
         availableAmountOut
       });
+      state.calculator.exceeded = true;
     } else {
       this.props.history.push('/exchange');
     }
@@ -80,8 +81,8 @@ class IndexPage extends React.Component {
       >
         <h1>{i18n.t('limitExceededPopup.header', {currency: state.calculator.out.name})}</h1>
         <p>{i18n.t('limitExceededPopup.text1', {
-          currencyIn: state.calculator.in.name,
-          currencyOut: state.calculator.out.name,
+          currencyIn: state.calculator.in.code,
+          currencyOut: state.calculator.out.code,
           availableAmountIn: this.state.availableAmountIn,
           availableAmountOut: this.state.availableAmountOut
         })}</p>
@@ -94,12 +95,12 @@ class IndexPage extends React.Component {
       >
         <h1>{i18n.t('maypayExceededPopup.header', {currency: state.calculator.in.name})}</h1>
         <p>{i18n.t('maypayExceededPopup.text1', {
-          currencyIn: state.calculator.in.name,
+          currencyIn: state.calculator.in.code,
           mayPay: this.state.mayPay
         })}</p>
         <p>{i18n.t('maypayExceededPopup.text2', {
-          currencyIn: state.calculator.in.name,
-          currencyOut: state.calculator.out.name
+          currencyIn: state.calculator.in.code,
+          currencyOut: state.calculator.out.code
         })}</p>
         <Button onClick={() => {
           this.setState({

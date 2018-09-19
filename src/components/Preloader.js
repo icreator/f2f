@@ -107,25 +107,6 @@ class P extends React.Component {
           }
         ]
       },
-      currencies: {
-        images: [
-          "currencies/bch-dark.png",
-          "currencies/bch-light.png",
-          "currencies/btc-dark.png",
-          "currencies/btc-light.png",
-          "currencies/btg-dark.png",
-          "currencies/btg-light.png",
-          "currencies/compu.png",
-          "currencies/dash-dark.png",
-          "currencies/dash-light.png",
-          "currencies/era.png",
-          "currencies/era20.png",
-          "currencies/eth-dark.png",
-          "currencies/eth-light.png",
-          "currencies/ltc-dark.png",
-          "currencies/ltc-light.png"
-        ]
-      },
       index: {
         images: [
           "about-bg.png",
@@ -155,7 +136,7 @@ class P extends React.Component {
           'faq-arrow.png',
           'faq-border.png',
           'contacts-bg.png'
-        ]
+          ]
       }
     };
     this.performLoad = this.performLoad.bind(this);

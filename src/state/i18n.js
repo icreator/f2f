@@ -14,7 +14,7 @@ export const i18n: {
   setLanguage: (lang: string) => void,
   loadLangs: () => Promise<void>,
   preloadTranslation: () => Promise<void>,
-  t: (string, ?{ [string]: React.Node }) => React.Node
+  t: (string, ?{ [string]: string & React.Node }) => React.Node
 } = store({
   lang: 'en',
   langs: { 'en': 'ENG' },
@@ -69,7 +69,7 @@ export const i18n: {
     }
     i18n.loaded = true
   },
-  t: (string: string, variables: ?{ [string]: React.Node }) => {
+  t: (string: string, variables: ?{ [string]: string & React.Node }) => {
     let translatedString = string
     if (i18n.translations.hasOwnProperty(i18n.lang)) {
       const newString = jsonpath.value(i18n.translations[i18n.lang], string)
@@ -78,12 +78,11 @@ export const i18n: {
       }
     }
     if (variables) {
-      translatedString = translatedString.split(/({\w+})/)
-      let newTranslatedString: React.Node = translatedString
+      let newTranslatedString: Array<string & React.Node> = translatedString.split(/({\w+})/)
       for (let variable in variables) {
         if (variables.hasOwnProperty(variable)) {
           const value = variables[variable]
-          newTranslatedString = translatedString.map(current => {
+          newTranslatedString = newTranslatedString.map(current => {
             if (current === `{${variable}}`) {
               return value
             }
@@ -125,7 +124,7 @@ export const TranslationContainer = view(TC)
 
 type TPropTypes = {
   string: string,
-  variables: ?{ [string]: React.Node }
+  variables: ?{ [string]: string & React.Node }
 }
 
 class T extends React.Component<TPropTypes> {

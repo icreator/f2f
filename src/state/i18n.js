@@ -14,7 +14,7 @@ export const i18n: {
   setLanguage: (lang: string) => void,
   loadLangs: () => Promise<void>,
   preloadTranslation: () => Promise<void>,
-  t: (string, ?{ [string]: mixed }) => string
+  t: (string, ?{ [string]: React.Node }) => React.Node
 } = store({
   lang: 'en',
   langs: { 'en': 'ENG' },
@@ -69,7 +69,7 @@ export const i18n: {
     }
     i18n.loaded = true
   },
-  t: (string: string, variables: ?{ [string]: mixed }) => {
+  t: (string: string, variables: ?{ [string]: React.Node }) => {
     let translatedString = string
     if (i18n.translations.hasOwnProperty(i18n.lang)) {
       const newString = jsonpath.value(i18n.translations[i18n.lang], string)
@@ -79,24 +79,19 @@ export const i18n: {
     }
     if (variables) {
       translatedString = translatedString.split(/({\w+})/)
+      let newTranslatedString: React.Node = translatedString
       for (let variable in variables) {
         if (variables.hasOwnProperty(variable)) {
           const value = variables[variable]
-          translatedString = translatedString.map(current => {
+          newTranslatedString = translatedString.map(current => {
             if (current === `{${variable}}`) {
-              if (typeof value === 'string' ||
-              typeof value === 'number') {
-                return `${value}`
-              } else {
-                console.warn(`Cannot coerce ${variable} (${typeof value}) to string`)
-                return current
-              }
+              return value
             }
             return current
           })
         }
       }
-      translatedString = translatedString.join()
+      return newTranslatedString
     }
     return translatedString
   }
@@ -113,7 +108,10 @@ class TC extends React.Component<TCPropTypes> {
 
   render () {
     if (i18n.loaded) {
-      document.title = i18n.t('windowTitle')
+      const title = i18n.t('windowTitle')
+      if (typeof title === 'string') {
+        document.title = title
+      }
       return <div>{this.props.children}</div>
     } else {
       return <div style={{ display: 'flex', width: '100vw', height: '100vh', justifyContent: 'center', alignItems: 'center' }}>
@@ -127,7 +125,7 @@ export const TranslationContainer = view(TC)
 
 type TPropTypes = {
   string: string,
-  variables: ?{ [string]: mixed }
+  variables: ?{ [string]: React.Node }
 }
 
 class T extends React.Component<TPropTypes> {

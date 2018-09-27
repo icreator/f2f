@@ -53,12 +53,14 @@ class AbortSignal extends eventTargetShim.EventTarget {
 }
 
 // Properties should be enumerable.
+// $FlowFixMe
 Object.defineProperties(AbortSignal.prototype, {
   aborted: {
     enumerable: true
   }
 })
 
+// $FlowFixMe
 if (typeof Symbol === 'function' && typeof Symbol.toStringTag === 'symbol') { // eslint-disable-line node/no-unsupported-features
   Object.defineProperty(AbortSignal.prototype, Symbol.toStringTag, { // eslint-disable-line node/no-unsupported-features
     configurable: true,
@@ -146,11 +148,13 @@ class AbortController {
 }
 
 // Properties should be enumerable.
+// $FlowFixMe
 Object.defineProperties(AbortController.prototype, {
   signal: { enumerable: true },
   abort: { enumerable: true }
 })
 
+// $FlowFixMe
 if (typeof Symbol === 'function' && typeof Symbol.toStringTag === 'symbol') { // eslint-disable-line node/no-unsupported-features
   Object.defineProperty(AbortController.prototype, Symbol.toStringTag, { // eslint-disable-line node/no-unsupported-features
     configurable: true,
@@ -163,5 +167,7 @@ exports.AbortController = AbortController
 exports.AbortSignal = AbortSignal
 
 module.exports = AbortController
+// $FlowFixMe
 module.exports.AbortController = AbortController
+// $FlowFixMe
 module.exports.AbortSignal = AbortSignal

@@ -7,6 +7,7 @@ test:all:
   stage: test
   script:
   - yarn install
+  - yarn run flow check
   - yarn build
   except:
   - staging
@@ -16,6 +17,7 @@ test:production:
   stage: test
   script:
   - yarn install
+  - yarn run flow check
   - yarn build
   - "echo \"$ssh_key\" > id_rsa"
   - chmod 600 id_rsa

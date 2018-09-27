@@ -6,8 +6,9 @@ stages:
 test:all:
   stage: test
   script:
-  - npm install
-  - npm run build
+  - yarn install
+  - yarn run flow check
+  - yarn build
   except:
   - staging
   - production
@@ -15,8 +16,9 @@ test:all:
 test:production:
   stage: test
   script:
-  - npm install
-  - npm run build
+  - yarn install
+  - yarn run flow check
+  - yarn build
   - "echo \"$ssh_key\" > id_rsa"
   - chmod 600 id_rsa
   - ssh -i id_rsa -o StrictHostKeyChecking=no root@face2face.dotterian.ru "rm -rf /var/www/face2face/* || true"

@@ -1,24 +1,24 @@
-import React from 'react';
-import {i18n} from "../../state/i18n";
-import state from '../../state/state';
-import "./CurrencySelector.scss";
+import React from 'react'
+import { i18n } from '../../state/i18n'
+import state from '../../state/state'
+import './CurrencySelector.scss'
 
 class CurrencySelector extends React.Component {
-  constructor(props) {
-    super(props);
+  constructor (props) {
+    super(props)
     this.state = {
       dropdown: false,
       current: this.props.value.id
-    };
-    this.dropdown = React.createRef();
+    }
+    this.dropdown = React.createRef()
   }
 
-  componentDidMount() {
-    document.addEventListener('mousedown', this.handleClickOutside);
+  componentDidMount () {
+    document.addEventListener('mousedown', this.handleClickOutside)
   }
 
-  componentWillUnmount() {
-    document.removeEventListener('mousedown', this.handleClickOutside);
+  componentWillUnmount () {
+    document.removeEventListener('mousedown', this.handleClickOutside)
   }
 
   handleClickOutside = (event) => {
@@ -26,28 +26,28 @@ class CurrencySelector extends React.Component {
       this.setState({
         dropdown: false,
         current: this.props.value.id
-      });
+      })
     }
-  };
+  }
 
   setValue = (currency) => {
     this.setState({
-      dropdown: false,
-    });
-    this.props.onChange(currency);
+      dropdown: false
+    })
+    this.props.onChange(currency)
   };
 
-  render() {
-    let dropdown = '';
-    let value = `-- ${i18n.t('calculator.placeholder')} --`;
-    let fieldClass = "field";
+  render () {
+    let dropdown = ''
+    let value = `-- ${i18n.t('calculator.placeholder')} --`
+    let fieldClass = 'field'
 
     if (this.state.dropdown) {
-      dropdown = [];
-      fieldClass += " active";
+      dropdown = []
+      fieldClass += ' active'
       for (let code in this.props.data) {
-        let currency = this.props.data[code];
-        let className = currency.id === this.state.current?'current':'';
+        let currency = this.props.data[code]
+        let className = currency.id === this.state.current ? 'current' : ''
         dropdown.push(<li
           key={currency.name}
           className={className}
@@ -56,32 +56,32 @@ class CurrencySelector extends React.Component {
             current: currency.id
           })}
         >
-          <img alt={code} src={`${state.serverName}${state.icon_url}/${currency.icon}`} className="currency-icon"/> <span className="currency-name">{currency.name}</span>
+          <img alt={code} src={`${state.serverName}${state.icon_url}/${currency.icon}`} className='currency-icon' /> <span className='currency-name'>{currency.name}</span>
         </li>)
       }
-      dropdown = <ul className="dropdown">
+      dropdown = <ul className='dropdown'>
         {dropdown}
       </ul>
     }
 
     if (this.props.value) {
       value = [
-        <img alt={this.props.value.name} key="icon" src={`${state.serverName}${state.icon_url}/${this.props.value.icon}`} className="currency-icon"/>,
-        <span key="name" className="currency-name">{this.props.value.name}</span>
-      ];
+        <img alt={this.props.value.name} key='icon' src={`${state.serverName}${state.icon_url}/${this.props.value.icon}`} className='currency-icon' />,
+        <span key='name' className='currency-name'>{this.props.value.name}</span>
+      ]
     }
 
-    return <div ref={this.dropdown} className="currency-selector-container">
+    return <div ref={this.dropdown} className='currency-selector-container'>
       <div className={fieldClass} onClick={() => this.setState({
         dropdown: !this.state.dropdown,
         current: this.props.value.id
       })}>
         {value}
       </div>
-      <input type="hidden" />
+      <input type='hidden' />
       {dropdown}
     </div>
   }
 }
 
-export default CurrencySelector;
+export default CurrencySelector

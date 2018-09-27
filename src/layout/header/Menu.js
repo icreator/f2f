@@ -1,91 +1,91 @@
-import React from 'react';
-import { Link, NavLink } from 'react-router-dom';
-import { i18n } from '../../state/i18n';
+import React from 'react'
+import { Link, NavLink } from 'react-router-dom'
+import { i18n } from '../../state/i18n'
 
 export default class Menu extends React.Component {
-  constructor(props) {
-    super(props);
+  constructor (props) {
+    super(props)
     this.state = {
       dropdown: false,
       current: i18n.lang
-    };
-    this.dropdown = React.createRef();
-    this.handleClickOutside = this.handleClickOutside.bind(this);
+    }
+    this.dropdown = React.createRef()
+    this.handleClickOutside = this.handleClickOutside.bind(this)
   }
 
-  componentDidMount() {
-    document.addEventListener('mousedown', this.handleClickOutside);
+  componentDidMount () {
+    document.addEventListener('mousedown', this.handleClickOutside)
   }
 
-  componentWillUnmount() {
-    document.removeEventListener('mousedown', this.handleClickOutside);
+  componentWillUnmount () {
+    document.removeEventListener('mousedown', this.handleClickOutside)
   }
 
-  handleClickOutside(event) {
+  handleClickOutside (event) {
     if (this.dropdown.current && !this.dropdown.current.contains(event.target)) {
       this.setState({
         dropdown: false
-      });
+      })
     }
   }
 
-  render() {
-    const langs = [];
-    let dropdown = '';
-    let onClick = () => {};
-    const currentLang = i18n.langs[i18n.lang];
+  render () {
+    const langs = []
+    let dropdown = ''
+    let onClick = () => {}
+    const currentLang = i18n.langs[i18n.lang]
 
     if (this.props.main) {
       onClick = () => {
         document.querySelector('#about-us').scrollIntoView({
           behavior: 'smooth'
-        });
+        })
       }
     }
 
     for (let code in i18n.langs) {
       if (!i18n.langs.hasOwnProperty(code)) {
-        continue;
+        continue
       }
-      let className = '';
-      const lang = i18n.langs[code];
+      let className = ''
+      const lang = i18n.langs[code]
       if (code === this.state.current) {
-        className = "current";
+        className = 'current'
       }
       langs.push(<li className={className} key={code}>
         <a onClick={() => {
           this.setState({
             dropdown: false
-          });
-          i18n.setLanguage(code);
+          })
+          i18n.setLanguage(code)
         }} onMouseOver={() => this.setState({
           current: code
         })}>
           {lang}
         </a>
-      </li>);
+      </li>)
     }
 
     if (this.state.dropdown) {
-      dropdown = <ul className="dropdown-list">
+      dropdown = <ul className='dropdown-list'>
         {langs}
-      </ul>;
+      </ul>
     }
 
-    return <nav className="menu">
-      <Link to="/#about-us" onClick={onClick}>{i18n.t('menu.about')}</Link>
-      <NavLink to="/payments">{i18n.t('menu.payments')}</NavLink>
-      <NavLink to="/support">{i18n.t('menu.support')}</NavLink>
-      <div ref={this.dropdown} className="dropdown-container">
+    return <nav className='menu'>
+      <Link to='/#about-us' onClick={onClick}>{i18n.t('menu.about')}</Link>
+      <NavLink to='/payments'>{i18n.t('menu.payments')}</NavLink>
+      <NavLink to='/support'>{i18n.t('menu.support')}</NavLink>
+      <div ref={this.dropdown} className='dropdown-container'>
         <button onClick={() => this.setState({
           dropdown: !this.state.dropdown,
           current: i18n.lang
         })}>
           {currentLang}
-          <i className="dropdown-arrow" />
+          <i className='dropdown-arrow' />
         </button>
         {dropdown}
       </div>
-    </nav>;
+    </nav>
   }
 }

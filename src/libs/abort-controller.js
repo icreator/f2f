@@ -1,18 +1,20 @@
+// @flow
+
 /**
  * @author Toru Nagashima <https://github.com/mysticatea>
  * @copyright 2017 Toru Nagashima. All rights reserved.
  * See LICENSE file in root directory for full license.
  */
 
-Object.defineProperty(exports, '__esModule', { value: true });
+Object.defineProperty(exports, '__esModule', { value: true })
 
-var eventTargetShim = require('./event-target-shim');
+var eventTargetShim = require('./event-target-shim')
 
 /**
  * Aborted flag for each instances.
  * @type {WeakMap<AbortSignal, boolean>}
  */
-const abortedFlags = new WeakMap();
+const abortedFlags = new WeakMap()
 
 /**
  * The signal class.
@@ -21,60 +23,60 @@ const abortedFlags = new WeakMap();
  * @see https://dom.spec.whatwg.org/#abortsignal
  */
 class AbortSignal extends eventTargetShim.EventTarget {
-    /**
-     * AbortSignal cannot be constructed directly.
-     */
-    constructor() {
-        super();
-        throw new TypeError("AbortSignal cannot be constructed directly")
-    }
+  /**
+   * AbortSignal cannot be constructed directly.
+   */
+  constructor () {
+    super()
+    throw new TypeError('AbortSignal cannot be constructed directly')
+  }
 
-    /**
-     * Returns `true` if this `AbortSignal`'s `AbortController` has signaled to abort, and `false` otherwise.
-     * @type {boolean}
-     */
-    get aborted() {
-        const aborted = abortedFlags.get(this);
-        if (typeof aborted !== "boolean") {
-            throw new TypeError(`Expected 'this' to be an 'AbortSignal' object, but got ${this === null ? "null" : typeof this}`)
-        }
-        return Boolean(aborted)
+  /**
+   * Returns `true` if this `AbortSignal`'s `AbortController` has signaled to abort, and `false` otherwise.
+   * @type {boolean}
+   */
+  get aborted () {
+    const aborted = abortedFlags.get(this)
+    if (typeof aborted !== 'boolean') {
+      throw new TypeError(`Expected 'this' to be an 'AbortSignal' object, but got ${this === null ? 'null' : typeof this}`)
     }
+    return Boolean(aborted)
+  }
 
-    /**
-     * The event attribute for `abort` event.
-     * @property
-     * @memberof AbortSignal
-     * @name onabort
-     * @type {Function}
-     */
+  /**
+   * The event attribute for `abort` event.
+   * @property
+   * @memberof AbortSignal
+   * @name onabort
+   * @type {Function}
+   */
 }
 
 // Properties should be enumerable.
 Object.defineProperties(AbortSignal.prototype, {
-    aborted: {
-        enumerable: true,
-    },
-});
+  aborted: {
+    enumerable: true
+  }
+})
 
-if (typeof Symbol === "function" && typeof Symbol.toStringTag === "symbol") { //eslint-disable-line node/no-unsupported-features
-    Object.defineProperty(AbortSignal.prototype, Symbol.toStringTag, { //eslint-disable-line node/no-unsupported-features
-        configurable: true,
-        value: "AbortSignal",
-    });
+if (typeof Symbol === 'function' && typeof Symbol.toStringTag === 'symbol') { // eslint-disable-line node/no-unsupported-features
+  Object.defineProperty(AbortSignal.prototype, Symbol.toStringTag, { // eslint-disable-line node/no-unsupported-features
+    configurable: true,
+    value: 'AbortSignal'
+  })
 }
 
-eventTargetShim.defineEventAttribute(AbortSignal.prototype, "abort");
+eventTargetShim.defineEventAttribute(AbortSignal.prototype, 'abort')
 
 /**
  * Create an AbortSignal object.
  * @returns {AbortSignal} The created AbortSignal object.
  */
-function createAbortSignal() {
-    const signal = Object.create(AbortSignal.prototype);
-    eventTargetShim.EventTarget.call(signal);
-    abortedFlags.set(signal, false);
-    return signal
+function createAbortSignal () {
+  const signal = Object.create(AbortSignal.prototype)
+  eventTargetShim.EventTarget.call(signal)
+  abortedFlags.set(signal, false)
+  return signal
 }
 
 /**
@@ -82,32 +84,32 @@ function createAbortSignal() {
  * @param {AbortSignal} signal The signal to abort.
  * @returns {void}
  */
-function abortSignal(signal) {
-    if (abortedFlags.get(signal) !== false) {
-        return
-    }
+function abortSignal (signal) {
+  if (abortedFlags.get(signal) !== false) {
+    return
+  }
 
-    abortedFlags.set(signal, true);
-    signal.dispatchEvent({ type: "abort" });
+  abortedFlags.set(signal, true)
+  signal.dispatchEvent({ type: 'abort' })
 }
 
 /**
  * Associated signals.
  * @type {WeakMap<AbortController, AbortSignal>}
  */
-const signals = new WeakMap();
+const signals = new WeakMap()
 
 /**
  * Get the associated signal of a given controller.
  * @param {AbortController} controller The controller to get its associated signal.
  * @returns {AbortSignal} The associated signal.
  */
-function getSignal(controller) {
-    const signal = signals.get(controller);
-    if (signal == null) {
-        throw new TypeError(`Expected 'this' to be an 'AbortController' object, but got ${controller === null ? "null" : typeof controller}`)
-    }
-    return signal
+function getSignal (controller) {
+  const signal = signals.get(controller)
+  if (signal == null) {
+    throw new TypeError(`Expected 'this' to be an 'AbortController' object, but got ${controller === null ? 'null' : typeof controller}`)
+  }
+  return signal
 }
 
 /**
@@ -115,52 +117,51 @@ function getSignal(controller) {
  * @see https://dom.spec.whatwg.org/#abortcontroller
  */
 class AbortController {
-    /**
-     * Initialize this controller.
-     */
-    constructor() {
-        signals.set(this, createAbortSignal());
-    }
+  /**
+   * Initialize this controller.
+   */
+  constructor () {
+    signals.set(this, createAbortSignal())
+  }
 
-    /**
-     * Returns the `AbortSignal` object associated with this object.
-     * @type {AbortSignal}
-     */
-    get signal() {
-        return getSignal(this)
-    }
+  /**
+   * Returns the `AbortSignal` object associated with this object.
+   * @type {AbortSignal}
+   */
+  get signal () {
+    return getSignal(this)
+  }
 
-    /**
-     * Abort and signal to any observers that the associated activity is to be aborted.
-     * @returns {void}
-     */
-    abort() {
-        // Not depend on this.signal which is overridable.
-        const signal = getSignal(this);
-        if (signal != null) {
-            abortSignal(signal);
-        }
+  /**
+   * Abort and signal to any observers that the associated activity is to be aborted.
+   * @returns {void}
+   */
+  abort () {
+    // Not depend on this.signal which is overridable.
+    const signal = getSignal(this)
+    if (signal != null) {
+      abortSignal(signal)
     }
+  }
 }
 
 // Properties should be enumerable.
 Object.defineProperties(AbortController.prototype, {
-    signal: { enumerable: true },
-    abort: { enumerable: true },
-});
+  signal: { enumerable: true },
+  abort: { enumerable: true }
+})
 
-if (typeof Symbol === "function" && typeof Symbol.toStringTag === "symbol") { //eslint-disable-line node/no-unsupported-features
-    Object.defineProperty(AbortController.prototype, Symbol.toStringTag, { //eslint-disable-line node/no-unsupported-features
-        configurable: true,
-        value: "AbortController",
-    });
+if (typeof Symbol === 'function' && typeof Symbol.toStringTag === 'symbol') { // eslint-disable-line node/no-unsupported-features
+  Object.defineProperty(AbortController.prototype, Symbol.toStringTag, { // eslint-disable-line node/no-unsupported-features
+    configurable: true,
+    value: 'AbortController'
+  })
 }
 
-exports.default = AbortController;
-exports.AbortController = AbortController;
-exports.AbortSignal = AbortSignal;
+exports.default = AbortController
+exports.AbortController = AbortController
+exports.AbortSignal = AbortSignal
 
 module.exports = AbortController
-module.exports.AbortController = module.exports["default"] = AbortController
+module.exports.AbortController = AbortController
 module.exports.AbortSignal = AbortSignal
-//# sourceMappingURL=abort-controller.js.map

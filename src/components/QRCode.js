@@ -1,22 +1,22 @@
-import React from 'react';
+import React from 'react'
 import QrCodeWithLogo from 'qr-code-with-logo'
 
 class QRCode extends React.Component {
-  constructor(props) {
-    super(props);
-    this.canvas = React.createRef();
-    this.renderQR = this.renderQR.bind(this);
+  constructor (props) {
+    super(props)
+    this.canvas = React.createRef()
+    this.renderQR = this.renderQR.bind(this)
   }
 
-  componentDidMount() {
-    this.renderQR();
+  componentDidMount () {
+    this.renderQR()
   }
 
-  componentDidUpdate() {
-    this.renderQR();
+  componentDidUpdate () {
+    this.renderQR()
   }
 
-  renderQR() {
+  renderQR () {
     QrCodeWithLogo.toCanvas({
       canvas: this.canvas.current,
       content: this.props.value,
@@ -27,13 +27,12 @@ class QRCode extends React.Component {
         borderSize: 0.04,
         borderRadius: 0
       }
-    });
+    })
   }
 
-  render() {
-    return <canvas ref={this.canvas} style={this.props.style}>
-    </canvas>;
+  render () {
+    return <canvas ref={this.canvas} style={this.props.style} />
   }
 }
 
-export default QRCode;
+export default QRCode

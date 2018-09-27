@@ -106,6 +106,8 @@
     "header": "Payment details",
     "search_placeholder": "enter your account number",
     "nothing_found": "No payments for this account",
+    "wrong_address": "Incorrect address",
+    "generalError": "Unexpected error occured, try again later.",
     "table": {
       "date": "Date",
       "sent": "Sent",

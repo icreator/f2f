@@ -123,9 +123,15 @@ class ExchangePage extends React.Component {
     }
   }
 
+  validateCheckboxes = () => {
+    if (state.calculator.exceeded) {
+      return this.state.agreeToOrder && this.state.agreeToLicense
+    }
+    return this.state.agreeToLicense
+  }
+
   validateAll = () => {
-    if ((state.calculator.exceeded && !this.state.agreeToOrder) ||
-        !this.state.agreeToLicense) {
+    if (!this.validateCheckboxes()) {
       this.setState({
         agreementsPopup: true
       })
@@ -285,6 +291,8 @@ class ExchangePage extends React.Component {
       </div>)
     }
 
+    const checkboxesValid = this.validateCheckboxes()
+
     return <div className='exchange-page'>
       {style}
       <div className='container-950'>
@@ -300,8 +308,8 @@ class ExchangePage extends React.Component {
       <div className='accounts-box' ref={this.container}>
         <h2 className='section-name'>{i18n.t('exchange.accounts.header')}</h2>
         <div className='accounts-fg'>
-          <span className='account-out-label'>{i18n.t('exchange.accounts.out_label', { currency: state.calculator.out.code })}</span>
-          <input className='account-out-input' onChange={() => {}} value={this.state.out_wallet} onInput={this.onInput} />
+          {checkboxesValid && <span className='account-out-label'>{i18n.t('exchange.accounts.out_label', { currency: state.calculator.out.code })}</span>}
+          {<input className={`account-out-input`} disabled={!checkboxesValid} onChange={() => {}} value={this.state.out_wallet} onInput={this.onInput} />}
           {this.state.wrongWallet && <span className='account-out-error'>{i18n.t('exchange.accounts.wrong_account')}</span>}
           {this.state.addressLoading && <div className='next-btn'><div className='address-loader' /></div>}
           {(this.state.validWallet && state.calculator.amountOut > 0) && <button className='next-btn' onClick={this.validateAll}>{i18n.t('exchange.accounts.next')}</button>}

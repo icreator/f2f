@@ -1,3 +1,4 @@
+// @flow
 import React from 'react'
 import { view } from 'react-easy-state'
 import { withRouter } from 'react-router'
@@ -13,19 +14,34 @@ import Popup from '../../components/Popup/Popup'
 import state from '../../state/state'
 import './IndexPage.scss'
 
-class IndexPage extends React.Component {
-  constructor (props) {
-    super(props)
-    this.state = {
-      popup: false,
-      mayPayPopup: false
-    }
-    this.exchange = this.exchange.bind(this)
+type PropTypes = {
+  history: {
+    push: (string) => void
+  },
+  location: {
+    hash: string
+  }
+}
+type StateTypes = {
+  popup: boolean,
+  mayPayPopup: boolean,
+  availableAmountIn?: number,
+  availableAmountOut?: number,
+  mayPay?: number
+}
+
+class IndexPage extends React.Component<PropTypes, StateTypes> {
+  state = {
+    popup: false,
+    mayPayPopup: false
   }
 
-  exchange () {
+  exchange = () => {
     const { amountOut, out: currOut } = state.calculator
-    const availableAmountOut = state.getAvailableAmount(currOut.id)
+    let availableAmountOut = state.getAvailableAmount(currOut.id)
+    if (!availableAmountOut) {
+      availableAmountOut = 0
+    }
     if (amountOut > availableAmountOut) {
       this.setState({
         popup: true,
@@ -37,24 +53,29 @@ class IndexPage extends React.Component {
     }
   }
 
-  checkMayPay () {
+  checkMayPay = () => {
     const { in: currIn, amountIn } = state.calculator
     const mayPay = state.getMayPay(currIn.id)
-    if (mayPay !== undefined && amountIn > mayPay) {
-      this.setState({
-        mayPayPopup: true,
-        mayPay
-      })
-    } else {
-      this.exchange()
+    if (mayPay) {
+      if (parseFloat(amountIn) > mayPay) {
+        this.setState({
+          mayPayPopup: true,
+          mayPay
+        })
+        return
+      }
     }
+    this.exchange()
   }
 
   componentDidMount () {
     if (this.props.location.hash) {
-      document.querySelector(this.props.location.hash).scrollIntoView({
-        behavior: 'smooth'
-      })
+      const aboutUs = document.querySelector(this.props.location.hash)
+      if (aboutUs) {
+        aboutUs.scrollIntoView({
+          behavior: 'smooth'
+        })
+      }
     }
   }
 
@@ -83,8 +104,8 @@ class IndexPage extends React.Component {
         <p>{i18n.t('limitExceededPopup.text1', {
           currencyIn: state.calculator.in.code,
           currencyOut: state.calculator.out.code,
-          availableAmountIn: this.state.availableAmountIn,
-          availableAmountOut: this.state.availableAmountOut
+          availableAmountIn: (this.state.availableAmountIn ? `${this.state.availableAmountIn}` : '0'),
+          availableAmountOut: (this.state.availableAmountOut ? `${this.state.availableAmountOut}` : '0')
         })}</p>
         <p>{i18n.t('limitExceededPopup.text2')}</p>
         <Link to='/exchange' className='btn'>{i18n.t('limitExceededPopup.btn')}</Link>
@@ -96,7 +117,7 @@ class IndexPage extends React.Component {
         <h1>{i18n.t('maypayExceededPopup.header', { currency: state.calculator.in.name })}</h1>
         <p>{i18n.t('maypayExceededPopup.text1', {
           currencyIn: state.calculator.in.code,
-          mayPay: this.state.mayPay
+          mayPay: (this.state.mayPay ? `${this.state.mayPay}` : '0')
         })}</p>
         <p>{i18n.t('maypayExceededPopup.text2', {
           currencyIn: state.calculator.in.code,

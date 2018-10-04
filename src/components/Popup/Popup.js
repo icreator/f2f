@@ -1,15 +1,21 @@
-import React from 'react'
+// @flow
+import * as React from 'react'
 import './Popup.scss'
 
-class Popup extends React.Component {
-  constructor (props) {
-    super(props)
-    this.state = {
-      show: false
-    }
-    this.popup = React.createRef()
-    this.handleClickOutside = this.handleClickOutside.bind(this)
+type PropTypes = {
+  open: boolean,
+  close: () => void,
+  children: React.Node
+}
+type StateTypes = {
+  show: boolean
+}
+
+class Popup extends React.Component<PropTypes, StateTypes> {
+  state = {
+    show: false
   }
+  popup: { current: null | HTMLDivElement } = React.createRef()
 
   componentDidMount () {
     if (this.props.open !== this.state.show) {
@@ -24,7 +30,7 @@ class Popup extends React.Component {
     document.removeEventListener('mousedown', this.handleClickOutside)
   }
 
-  static getDerivedStateFromProps (props, state) {
+  static getDerivedStateFromProps (props: PropTypes, state: StateTypes) {
     if (props.open !== state.show) {
       return {
         show: props.open
@@ -33,7 +39,10 @@ class Popup extends React.Component {
     return null
   }
 
-  handleClickOutside (event) {
+  handleClickOutside = (event: MouseEvent) => {
+    if (!(event.target instanceof Node)) { // eslint-disable-line no-undef
+      return
+    }
     if (this.popup.current && !this.popup.current.contains(event.target)) {
       this.props.close()
     }

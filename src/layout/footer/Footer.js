@@ -1,9 +1,10 @@
+// @flow
 import React from 'react'
 import { view } from 'react-easy-state'
 import { i18n } from '../../state/i18n'
 import './Footer.scss'
 
-class Footer extends React.Component {
+class Footer extends React.Component<{}> {
   render () {
     let year = ''
     const currYear = (new Date()).getFullYear()

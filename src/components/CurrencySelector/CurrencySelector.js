@@ -1,17 +1,45 @@
-import React from 'react'
+// @flow
+
+import * as React from 'react'
 import { i18n } from '../../state/i18n'
 import state from '../../state/state'
 import './CurrencySelector.scss'
 
-class CurrencySelector extends React.Component {
-  constructor (props) {
-    super(props)
-    this.state = {
-      dropdown: false,
-      current: this.props.value.id
-    }
-    this.dropdown = React.createRef()
+type PropTypes = {
+  value: {
+    id: number,
+    name: string,
+    icon: string,
+    code: string
+  },
+  onChange: ({
+    id: number,
+    name: string,
+    icon: string,
+    code: string
+  }) => void,
+  data: { [string]: {
+    id: number,
+    name: string,
+    icon: string,
+    code: string,
+    name2: string,
+    may_pay?: number,
+    bal?: number
+  }}
+}
+type StateTypes = {
+  dropdown: boolean,
+  current: number
+}
+
+class CurrencySelector extends React.Component<PropTypes, StateTypes> {
+  state = {
+    dropdown: false,
+    current: this.props.value.id
   }
+
+  dropdown: { current: null | HTMLDivElement } = React.createRef()
 
   componentDidMount () {
     document.addEventListener('mousedown', this.handleClickOutside)
@@ -21,7 +49,10 @@ class CurrencySelector extends React.Component {
     document.removeEventListener('mousedown', this.handleClickOutside)
   }
 
-  handleClickOutside = (event) => {
+  handleClickOutside = (event: MouseEvent) => {
+    if (!(event.target instanceof Node)) { // eslint-disable-line no-undef
+      return
+    }
     if (this.dropdown.current && !this.dropdown.current.contains(event.target)) {
       this.setState({
         dropdown: false,
@@ -30,7 +61,12 @@ class CurrencySelector extends React.Component {
     }
   }
 
-  setValue = (currency) => {
+  setValue = (currency: {
+    id: number,
+    name: string,
+    icon: string,
+    code: string
+  }) => {
     this.setState({
       dropdown: false
     })
@@ -39,7 +75,7 @@ class CurrencySelector extends React.Component {
 
   render () {
     let dropdown = ''
-    let value = `-- ${i18n.t('calculator.placeholder')} --`
+    let value = ['-- ', i18n.t('calculator.placeholder'), ' --']
     let fieldClass = 'field'
 
     if (this.state.dropdown) {

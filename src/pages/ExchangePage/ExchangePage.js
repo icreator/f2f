@@ -1,3 +1,4 @@
+// @flow
 import React from 'react'
 import { view } from 'react-easy-state'
 import { Link } from 'react-router-dom'
@@ -12,10 +13,36 @@ import './ExchangePage.scss'
 import { fetch } from 'whatwg-fetch'
 import AbortController from '../../libs/abort-controller'
 
+type PropTypes = {||}
+type StateTypes = {
+  agreeToLicense: boolean,
+  agreeToOrder: boolean,
+  headerSize: number,
+  textSize: number,
+  inWallet: string,
+  out_wallet: string,
+  wrongWallet: boolean,
+  validWallet: boolean,
+  qr: boolean,
+  qrUri: string,
+  copied: boolean,
+  copiedText: string,
+  lightbox: boolean,
+  addressLoading: boolean,
+  addressInLoading: boolean,
+  agreementsPopup: boolean,
+  mayPayPopup: boolean,
+  mayPay?: number,
+  availableAmountIn?: number,
+  availableAmountOut?: number,
+  popup: boolean,
+  order: boolean
+}
+
 const abortableFetch = ('signal' in new window.Request('')) ? window.fetch : fetch
 const NewAbortController = ('AbortController' in window) ? window.AbortController : AbortController
 
-class ExchangePage extends React.Component {
+class ExchangePage extends React.Component<PropTypes, StateTypes> {
   state = {
     agreeToLicense: false,
     agreeToOrder: false,
@@ -31,9 +58,15 @@ class ExchangePage extends React.Component {
     copiedText: 'exchange.accounts.wallet_copied',
     lightbox: false,
     addressLoading: false,
-    addressInLoading: false
+    addressInLoading: false,
+    agreementsPopup: false,
+    mayPayPopup: false,
+    popup: false,
+    order: false
   };
-  container = React.createRef();
+  container: { current: null | HTMLDivElement } = React.createRef();
+
+  abortController: typeof NewAbortController
 
   componentDidMount () {
     this.resizeText()
@@ -58,16 +91,16 @@ class ExchangePage extends React.Component {
     })
   };
 
-  onInput = (e) => {
-    const value = e.target.value
+  onInput = (e: SyntheticEvent<HTMLInputElement>) => {
+    const value = e.currentTarget.value
     let signal
     if (value === '') {
       this.setState({
         wrongWallet: false,
         validWallet: false,
         out_wallet: value,
-        in_wallet: '',
-        qr_uri: ''
+        inWallet: '',
+        qrUri: ''
       })
       return
     }
@@ -76,11 +109,15 @@ class ExchangePage extends React.Component {
       validWallet: false,
       addressLoading: true,
       out_wallet: value,
-      in_wallet: '',
-      qr_uri: ''
+      inWallet: '',
+      qrUri: ''
     })
     if (this.abortController !== undefined) {
+      // $FlowFixMe
       this.abortController.abort()
+    }
+    if (!NewAbortController) {
+      return
     }
     this.abortController = new NewAbortController()
     signal = this.abortController.signal
@@ -88,7 +125,7 @@ class ExchangePage extends React.Component {
       signal
     })
       .then(r => r.json())
-      .then(r => {
+      .then((r: { error?: string }) => {
         if (r.error) {
           this.setState({
             wrongWallet: true,
@@ -100,7 +137,7 @@ class ExchangePage extends React.Component {
             addressLoading: false
           })
         }
-      }, e => {
+      }, (e: { name: string }) => {
         if (e.name !== 'AbortError') {
           this.setState({
             wrongWallet: false,
@@ -109,13 +146,13 @@ class ExchangePage extends React.Component {
           console.log(e)
         }
       })
-  };
+  }
 
   copyToClipboard = (e, copiedText) => {
-    if (e.target.value.length > 0) {
-      e.target.setSelectionRange(0, e.target.value.length)
+    if (e.currentTarget.value.length > 0) {
+      e.currentTarget.setSelectionRange(0, e.currentTarget.value.length)
       document.execCommand('copy')
-      e.target.setSelectionRange(0, 0)
+      e.currentTarget.setSelectionRange(0, 0)
       this.setState({
         copied: true,
         copiedText
@@ -123,9 +160,15 @@ class ExchangePage extends React.Component {
     }
   }
 
+  validateCheckboxes = () => {
+    if (state.calculator.exceeded) {
+      return this.state.agreeToOrder && this.state.agreeToLicense
+    }
+    return this.state.agreeToLicense
+  }
+
   validateAll = () => {
-    if ((state.calculator.exceeded && !this.state.agreeToOrder) ||
-        !this.state.agreeToLicense) {
+    if (!this.validateCheckboxes()) {
       this.setState({
         agreementsPopup: true
       })
@@ -137,19 +180,24 @@ class ExchangePage extends React.Component {
   checkMayPay = () => {
     const { in: currIn, amountIn } = state.calculator
     const mayPay = state.getMayPay(currIn.id)
-    if (mayPay !== undefined && amountIn > mayPay) {
-      this.setState({
-        mayPayPopup: true,
-        mayPay
-      })
-    } else {
-      this.checkExceeded()
+    if (mayPay) {
+      if (parseFloat(amountIn) > mayPay) {
+        this.setState({
+          mayPayPopup: true,
+          mayPay
+        })
+        return
+      }
     }
+    this.checkExceeded()
   }
 
   checkExceeded = () => {
     const { amountOut, out: currOut } = state.calculator
-    const availableAmountOut = state.getAvailableAmount(currOut.id)
+    let availableAmountOut = state.getAvailableAmount(currOut.id)
+    if (!availableAmountOut) {
+      availableAmountOut = 0
+    }
     if (amountOut > availableAmountOut) {
       this.setState({
         popup: true,
@@ -164,12 +212,20 @@ class ExchangePage extends React.Component {
   getInWallet = () => {
     this.setState({
       addressInLoading: true,
-      in_wallet: '',
-      qr_uri: ''
+      inWallet: '',
+      qrUri: ''
     })
     fetch(`${state.serverName}/apipay/get_uri.json/2/${state.calculator.in.id}/${state.calculator.out.id}/${this.state.out_wallet}/${state.calculator.amountOut}`)
       .then(r => r.json())
-      .then(({ addr_in: inWallet, uri: qrUri, error }) => {
+      .then(({
+        addr_in: inWallet,
+        uri: qrUri,
+        error
+      }: {
+        addr_in: string, // eslint-disable-line react/no-unused-prop-types
+        uri: string, // eslint-disable-line react/no-unused-prop-types
+        error?: string // eslint-disable-line react/no-unused-prop-types
+      }) => {
         if (error) {
           if (/address not valid/.exec(error)) {
             this.setState({
@@ -193,8 +249,8 @@ class ExchangePage extends React.Component {
   resetForm = () => {
     this.setState({
       out_wallet: '',
-      in_wallet: '',
-      qr_uri: '',
+      inWallet: '',
+      qrUri: '',
       wrongWallet: false,
       validWallet: false,
       agreeToOrder: false,
@@ -217,10 +273,10 @@ class ExchangePage extends React.Component {
     </style>
     let header = i18n.t('exchange.header.exchange')
     let rateInfo = <span key='line1'>
-      <span className='bold'>{`${i18n.t('exchange.rateInfo.rate')}:`}</span>
+      <span className='bold'>{[i18n.t('exchange.rateInfo.rate'), ':']}</span>
       {
         // eslint-disable-next-line eqeqeq
-        ` ${state.calculator.amountIn == 0 ? 0 : 1} ${state.calculator.in.code} = ${state.calculator.rate} ${state.calculator.out.code}`}
+        ` ${parseFloat(state.calculator.amountIn) == 0 ? 0 : 1} ${state.calculator.in.code} = ${state.calculator.rate} ${state.calculator.out.code}`}
       {/* <span className="bold">{` ${i18n.t('exchange.rateInfo.commission')}:`}</span> */}
       {/* {` ${this.state.commission} ${state.calculator.out.code}`} */}
     </span>
@@ -237,19 +293,21 @@ class ExchangePage extends React.Component {
             agreeToLicense: !this.state.agreeToLicense
           })}
         >{i18n.t('exchange.checkboxes.licenses', {
+          // $FlowFixMe
           privacy_policy_link: <a
             key='privacy_policy'
             href={`/locales/${i18n.lang}/privacy_policy.pdf`}
             target='_blank'
-            onClick={e => e.stopPropagation()}
+            onClick={(e: Event) => e.stopPropagation()}
           >
             {i18n.t('exchange.checkboxes.privacy_policy_link')}
           </a>,
+          // $FlowFixMe
           terms_of_use_link: <a
             key='terms_of_use'
             href={`/locales/${i18n.lang}/terms_of_use.pdf`}
             target='_blank'
-            onClick={e => e.stopPropagation()}
+            onClick={(e: Event) => e.stopPropagation()}
           >
             {i18n.t('exchange.checkboxes.terms_of_use_link')}
           </a>
@@ -259,14 +317,17 @@ class ExchangePage extends React.Component {
 
     if (state.calculator.exceeded) {
       header = i18n.t('exchange.header.order')
-      const availableAmountOut = state.getAvailableAmount(state.calculator.out.id)
+      let availableAmountOut = state.getAvailableAmount(state.calculator.out.id)
+      if (!availableAmountOut) {
+        availableAmountOut = 0
+      }
       rateInfo = [
         rateInfo,
         <br key='br' />,
         <span key='line2'>
-          <span className='bold'>{`${i18n.t('exchange.rateInfo.available')}:`}</span>
+          <span className='bold'>{[i18n.t('exchange.rateInfo.available'), ':']}</span>
           {` ${availableAmountOut} ${state.calculator.out.code}, `}
-          <span className='bold'>{ `${i18n.t('exchange.rateInfo.debt')}:`}</span>
+          <span className='bold'>{[i18n.t('exchange.rateInfo.debt'), ':']}</span>
           {` ${state.calculator.amountOut - availableAmountOut} ${state.calculator.out.code}`}
         </span>
       ]
@@ -285,6 +346,8 @@ class ExchangePage extends React.Component {
       </div>)
     }
 
+    const checkboxesValid = this.validateCheckboxes()
+
     return <div className='exchange-page'>
       {style}
       <div className='container-950'>
@@ -300,13 +363,13 @@ class ExchangePage extends React.Component {
       <div className='accounts-box' ref={this.container}>
         <h2 className='section-name'>{i18n.t('exchange.accounts.header')}</h2>
         <div className='accounts-fg'>
-          <span className='account-out-label'>{i18n.t('exchange.accounts.out_label', { currency: state.calculator.out.code })}</span>
-          <input className='account-out-input' onChange={() => {}} value={this.state.out_wallet} onInput={this.onInput} />
+          {checkboxesValid && <span className='account-out-label'>{i18n.t('exchange.accounts.out_label', { currency: state.calculator.out.code })}</span>}
+          {<input className={`account-out-input`} disabled={!checkboxesValid} onChange={() => {}} value={this.state.out_wallet} onInput={this.onInput} />}
           {this.state.wrongWallet && <span className='account-out-error'>{i18n.t('exchange.accounts.wrong_account')}</span>}
           {this.state.addressLoading && <div className='next-btn'><div className='address-loader' /></div>}
           {(this.state.validWallet && state.calculator.amountOut > 0) && <button className='next-btn' onClick={this.validateAll}>{i18n.t('exchange.accounts.next')}</button>}
           {this.state.inWallet !== '' && <span className='account-in-label'>{i18n.t('exchange.accounts.in_label', { currency: state.calculator.in.code })}</span>}
-          <input title={i18n.t('exchange.accounts.click_to_copy')} className='account-in-input' readOnly onClick={(e) => this.copyToClipboard(e, 'exchange.accounts.wallet_copied')} value={this.state.inWallet} />
+          <input title={i18n.t('exchange.accounts.click_to_copy')} className='account-in-input' readOnly onClick={(e: SyntheticEvent<HTMLInputElement>) => this.copyToClipboard(e, 'exchange.accounts.wallet_copied')} value={this.state.inWallet} />
           {(this.state.inWallet !== '' && this.state.qrUri !== '') && <button className='qr-code-btn' onClick={() => this.setState({
             qr: true
           })}>{i18n.t('exchange.accounts.qr_code')}</button>}
@@ -319,7 +382,7 @@ class ExchangePage extends React.Component {
           <div className='right-part'>
             <span>{i18n.t('exchange.era_warning.text')}</span>
             <div>
-              <input title={i18n.t('exchange.era_warning.click_to_copy')} value={`${state.calculator.out.code}:${this.state.out_wallet}`} readOnly onClick={(e) => this.copyToClipboard(e, 'exchange.era_warning.wallet_copied')} />
+              <input title={i18n.t('exchange.era_warning.click_to_copy')} value={`${state.calculator.out.code}:${this.state.out_wallet}`} readOnly onClick={(e: SyntheticEvent<HTMLInputElement>) => this.copyToClipboard(e, 'exchange.era_warning.wallet_copied')} />
               <button className='question-mark-btn' onClick={() => this.setState({ lightbox: true })} />
             </div>
           </div>
@@ -327,8 +390,10 @@ class ExchangePage extends React.Component {
       </div>}
       {this.state.inWallet && <div className='container-950 ta-center'>
         <p>
-          {this.state.order && <span>{i18n.t('exchange.success.message[0]')}<br /></span>}
-          {i18n.t('exchange.success.message[1]')}
+          {[
+            this.state.order && <span>{i18n.t('exchange.success.message[0]')}<br /></span>,
+            i18n.t('exchange.success.message[1]')
+          ]}
         </p>
         <hr className='short-hr' />
         <p>
@@ -375,8 +440,8 @@ class ExchangePage extends React.Component {
         <p>{i18n.t('limitExceededPopup.text1', {
           currencyIn: state.calculator.in.code,
           currencyOut: state.calculator.out.code,
-          availableAmountIn: this.state.availableAmountIn,
-          availableAmountOut: this.state.availableAmountOut
+          availableAmountIn: (this.state.availableAmountIn ? `${this.state.availableAmountIn}` : '0'),
+          availableAmountOut: (this.state.availableAmountOut ? `${this.state.availableAmountOut}` : '0')
         })}</p>
         <p>{i18n.t('limitExceededPopup.text2')}</p>
         <Button onClick={() => {
@@ -393,7 +458,7 @@ class ExchangePage extends React.Component {
         <h1>{i18n.t('maypayExceededPopup.header', { currency: state.calculator.in.name })}</h1>
         <p>{i18n.t('maypayExceededPopup.text1', {
           currencyIn: state.calculator.in.code,
-          mayPay: this.state.mayPay
+          mayPay: (this.state.mayPay ? `${this.state.mayPay}` : '0')
         })}</p>
         <p>{i18n.t('maypayExceededPopup.text2', {
           currencyIn: state.calculator.in.code,

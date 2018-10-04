@@ -1,17 +1,22 @@
+// @flow
 import React from 'react'
 import { Link, NavLink } from 'react-router-dom'
 import { i18n } from '../../state/i18n'
 
-export default class Menu extends React.Component {
-  constructor (props) {
-    super(props)
-    this.state = {
-      dropdown: false,
-      current: i18n.lang
-    }
-    this.dropdown = React.createRef()
-    this.handleClickOutside = this.handleClickOutside.bind(this)
+type PropTypes = {
+  main: boolean
+}
+type StateTypes = {
+  dropdown: boolean,
+  current: string
+}
+
+export default class Menu extends React.Component<PropTypes, StateTypes> {
+  state = {
+    dropdown: false,
+    current: i18n.lang
   }
+  dropdown: { current: null | HTMLDivElement } = React.createRef()
 
   componentDidMount () {
     document.addEventListener('mousedown', this.handleClickOutside)
@@ -21,7 +26,10 @@ export default class Menu extends React.Component {
     document.removeEventListener('mousedown', this.handleClickOutside)
   }
 
-  handleClickOutside (event) {
+  handleClickOutside = (event: MouseEvent) => {
+    if (!(event.target instanceof Node)) { // eslint-disable-line no-undef
+      return
+    }
     if (this.dropdown.current && !this.dropdown.current.contains(event.target)) {
       this.setState({
         dropdown: false
@@ -37,9 +45,12 @@ export default class Menu extends React.Component {
 
     if (this.props.main) {
       onClick = () => {
-        document.querySelector('#about-us').scrollIntoView({
-          behavior: 'smooth'
-        })
+        const aboutUs = document.querySelector('#about-us')
+        if (aboutUs) {
+          aboutUs.scrollIntoView({
+            behavior: 'smooth'
+          })
+        }
       }
     }
 

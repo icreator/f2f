@@ -1,7 +1,20 @@
+// @flow
+
 import React from 'react'
 import './CurrencyInput.scss'
 
-class CurrencyInput extends React.Component {
+type PropTypes = {
+  value: string,
+  error: boolean,
+  loading: boolean,
+  onInput: (SyntheticEvent<HTMLInputElement>) => void
+}
+
+type StateTypes = {
+  animation: string
+}
+
+class CurrencyInput extends React.Component<PropTypes, StateTypes> {
   state = {
     animation: ''
   };
@@ -9,7 +22,7 @@ class CurrencyInput extends React.Component {
   lastKey = '';
   animationQueue = [];
 
-  addAnimation = (className, timeout) => {
+  addAnimation = (className: string, timeout: number) => {
     this.animationQueue.push([className, timeout])
     if (this.animationQueue.length === 1) {
       this.processQueue()
@@ -30,23 +43,23 @@ class CurrencyInput extends React.Component {
     }, item[1])
   };
 
-  onInput = (event) => {
-    const startingValue = event.target.value
-    event.target.value = event.target.value.replace(/[^0-9.]/g, '')
-    if (/(\d*\.\d*)\.(\d*)/g.exec(event.target.value)) {
-      event.target.value = event.target.value.replace(/(\d*\.\d*)\.(\d*)/gm, '$1$2')
+  onInput = (event: SyntheticEvent<HTMLInputElement>) => {
+    const startingValue: string = event.currentTarget.value
+    event.currentTarget.value = event.currentTarget.value.replace(/[^0-9.]/g, '')
+    if (/(\d*\.\d*)\.(\d*)/g.exec(event.currentTarget.value)) {
+      event.currentTarget.value = event.currentTarget.value.replace(/(\d*\.\d*)\.(\d*)/gm, '$1$2')
     }
-    if (/^\.\d*$/g.exec(event.target.value)) {
-      event.target.value = event.target.value.replace(/^\.(\d*)$/g, '0.$1')
+    if (/^\.\d*$/g.exec(event.currentTarget.value)) {
+      event.currentTarget.value = event.currentTarget.value.replace(/^\.(\d*)$/g, '0.$1')
       this.props.onInput(event)
       return
     }
-    if (event.target.value === startingValue) {
+    if (event.currentTarget.value === startingValue) {
       this.props.onInput(event)
     }
   };
 
-  componentDidUpdate (prevProps, prevState) {
+  componentDidUpdate (prevProps: PropTypes, prevState: StateTypes) {
     if (this.props.loading && this.animationQueue.length === 0) {
       this.addAnimation('in', 310)
     }

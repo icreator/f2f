@@ -1,5 +1,5 @@
 // @flow
-import React from 'react'
+import * as React from 'react'
 import { Route } from 'react-router'
 import Preloader from '../components/Preloader'
 import Header from './header/Header'

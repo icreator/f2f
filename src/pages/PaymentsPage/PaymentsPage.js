@@ -12,22 +12,25 @@ type HistoryResponse = {
   error?: string,
   done: Array<{
     acc: string,
-    pay_out: {
+    pay_out?: {
       created_on: string,
       amount: number,
       vars: {
         status: "success"
       }
     },
-    curr_in: string,
-    pay_in: {
-      amount: number,
-      stasus: "ok",
-      txid: string
+    curr_in: {
+      abbrev: string,
+      id: number
     },
-    curr_in_id: number,
-    curr_out_id: number,
-    curr_out: string
+    curr_out: {
+      abbrev: string,
+      id: number
+    },
+    amount_in: number,
+    stasus: "ok",
+    txid: string,
+    status_mess: string
   }>
 }
 
@@ -41,8 +44,8 @@ type State = {
     // rate: number,
     received: number,
     receivedCurrency: string,
-    statusOut: ?('pending' | 'complete'),
-    inTxId: string
+    statusOut: 'pending' | 'complete' | 'none',
+    inTxId: string,
   }>,
   error: ?string,
   loading: boolean
@@ -100,14 +103,14 @@ class PaymentsPage extends React.Component<{}, State> {
         const data = []
         for (let row of result.done) {
           data.push({
-            sent: row.pay_in.amount,
-            sentCurrency: row.curr_in,
-            statusIn: (row.pay_in.stasus === 'ok') ? 'complete' : 'pending',
+            sent: row.amount_in,
+            sentCurrency: row.curr_in.abbrev,
+            statusIn: (row.stasus === 'ok') ? 'complete' : 'pending',
             // rate: row. // TODO: Add Rate
-            received: row.pay_out.amount,
-            receivedCurrency: row.curr_out,
-            statusOut: (row.pay_out.vars.status === 'success') ? 'complete' : 'pending',
-            inTxId: row.pay_in.txid
+            received: (row.pay_out ? row.pay_out.amount : parseFloat(row.status_mess)),
+            receivedCurrency: row.curr_out.abbrev,
+            statusOut: (row.pay_out ? (row.pay_out.vars.status === 'success') ? 'complete' : 'pending' : 'none'),
+            inTxId: row.txid
           })
         }
         this.setState({
@@ -140,7 +143,7 @@ class PaymentsPage extends React.Component<{}, State> {
         string = i18n.t('payments_page.generalError')
       } else if (/wrong address/.exec(string)) {
         string = i18n.t('payments_page.wrong_address')
-      } else if (/Deals not found/.exec(string)) {
+      } else if (/Deals not found/.exec(string) || /Use ABBREV\/ACCOUNT/.exec(string)) {
         string = i18n.t('payments_page.nothing_found')
       }
       results = <span className='not-found'>{string}</span>

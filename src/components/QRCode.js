@@ -1,12 +1,15 @@
+// @flow
 import React from 'react'
 import QrCodeWithLogo from 'qr-code-with-logo'
 
-class QRCode extends React.Component {
-  constructor (props) {
-    super(props)
-    this.canvas = React.createRef()
-    this.renderQR = this.renderQR.bind(this)
-  }
+type PropTypes = {
+  value: string,
+  logo: string,
+  style?: {}
+}
+
+class QRCode extends React.Component<PropTypes> {
+  canvas: { current: null | HTMLCanvasElement } = React.createRef()
 
   componentDidMount () {
     this.renderQR()
@@ -16,7 +19,10 @@ class QRCode extends React.Component {
     this.renderQR()
   }
 
-  renderQR () {
+  renderQR = () => {
+    if (!this.canvas.current) {
+      return
+    }
     QrCodeWithLogo.toCanvas({
       canvas: this.canvas.current,
       content: this.props.value,

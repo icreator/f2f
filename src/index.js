@@ -1,3 +1,4 @@
+// @flow
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { BrowserRouter as Router, Switch } from 'react-router-dom'
@@ -14,8 +15,9 @@ import ErrorPage from './pages/ErrorPage/ErrorPage'
 import './easter.js'
 import './index.scss'
 
-class App extends React.Component {
+class App extends React.Component<{}> {
   render () {
+    // $FlowFixMe
     return <Router basename={process.env.PUBLIC_URL} onUpdate={() => window.scrollTo(0, 0)}>
       <Switch>
         <PreloaderRoute exact path='/' bundles={['index']} component={IndexPage} />
@@ -33,5 +35,10 @@ const Application = hot(module)(App)
 i18n.loadLangs()
   .then(() => state.loadCurrencies())
   .then(() => {
-    ReactDOM.render(<Application />, document.querySelector('#root'))
+    const root = document.querySelector('#root')
+    if (root) {
+      ReactDOM.render(<Application />, root)
+    } else {
+      console.log('Root application element doesn\'t exist')
+    }
   })

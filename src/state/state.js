@@ -30,7 +30,7 @@ const face2faceState: {
   loadCurrencies: () => Promise<void>,
   loadRates: () => Promise<void>,
   getRate: (string, string) => number,
-  getAvailableAmount: (number) => ?number,
+  getAvailableAmount: (number) => void | number,
   getMayPay: (number) => ?number,
   icon_url: string,
   currencies: {
@@ -40,7 +40,8 @@ const face2faceState: {
       icon: string,
       name: string,
       name2: string,
-      bal: number
+      bal?: number,
+      may_pay?: number
     }},
     in: {[string]: {
       id: number,
@@ -48,23 +49,35 @@ const face2faceState: {
       icon: string,
       name: string,
       name2: string,
-      may_pay: number
+      may_pay?: number,
+      bal?: number
     }}
   },
   rates: RatesResponse,
   calculator: {
-    in: {},
-    out: {},
-    amountIn: number,
+    in: {
+      id: number,
+      name: string,
+      icon: string,
+      code: string
+    },
+    out: {
+      id: number,
+      name: string,
+      icon: string,
+      code: string
+    },
+    amountIn: string,
     amountOut: number,
     usdValue: number,
-    rate: number
+    rate: number,
+    exceeded: boolean
   }
 } = store({
   serverName: 'http://face2face.cash',
   loadCurrencies () {
     return window.fetch(`${face2faceState.serverName}/apipay/get_currs.json`)
-      .then(r => r.json())
+      .then((r: { json: () => Promise<{}> }) => r.json())
       .then((r: GetCurrsResponse) => {
         face2faceState.icon_url = r.icon_url
         Object.entries(r.in).map(([code, item]) => {
@@ -86,7 +99,7 @@ const face2faceState: {
   },
   loadRates () {
     return window.fetch(`${face2faceState.serverName}/api/rates3.json`)
-      .then(r => r.json())
+      .then((r: { json: () => Promise<{}> }) => r.json())
       .then((rates: RatesResponse) => { face2faceState.rates = rates })
   },
   getRate (currOutKey, currInCode) {
@@ -125,12 +138,23 @@ const face2faceState: {
   },
   rates: {},
   calculator: {
-    in: {},
-    out: {},
-    amountIn: 0,
+    in: {
+      id: 0,
+      name: '',
+      icon: '',
+      code: ''
+    },
+    out: {
+      id: 0,
+      name: '',
+      icon: '',
+      code: ''
+    },
+    amountIn: '',
     amountOut: 0,
     usdValue: 0,
-    rate: 0
+    rate: 0,
+    exceeded: false
   }
 })
 

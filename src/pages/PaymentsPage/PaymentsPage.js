@@ -1,5 +1,4 @@
 // @flow
-
 import React from 'react'
 import { view } from 'react-easy-state'
 import { fetch } from 'whatwg-fetch'

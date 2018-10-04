@@ -1,5 +1,4 @@
 // @flow
-
 import * as React from 'react'
 import { store, view } from 'react-easy-state'
 import * as jsonpath from 'jsonpath'
@@ -28,10 +27,10 @@ export const i18n: {
   },
   loadLangs: async () => {
     const buildTime = process.env.REACT_APP_BUILD_TIME || '0'
-    const langs = await window.fetch(`/locales/locales.json?v=${buildTime}`)
+    const langs: {[string]: string} = await window.fetch(`/locales/locales.json?v=${buildTime}`)
       .then((result): Promise<{ [string]: string }> => result.json())
     let lang = null
-    const translations = {}
+    const translations: {[string]: {[string]: string}} = {}
 
     for (let langCode in langs) {
       translations[langCode] = await window.fetch(`/locales/${langCode}/translation.json?v=${buildTime}`)

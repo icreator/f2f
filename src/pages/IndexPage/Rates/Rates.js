@@ -1,17 +1,20 @@
+// @flow
 import React from 'react'
 import { i18n } from '../../../state/i18n'
 import state from '../../../state/state'
 import { view } from 'react-easy-state'
 import './Rates.scss'
 
-class Rates extends React.Component {
-  constructor (props) {
-    super(props)
-    this.state = {
-      headerSize: 116.25
-    }
-    this.container = React.createRef()
+type PropTypes = {||}
+type StateTypes = {
+  headerSize: number
+}
+
+class Rates extends React.Component<PropTypes, StateTypes> {
+  state = {
+    headerSize: 116.25
   }
+  container: { current: null | HTMLDivElement } = React.createRef()
 
   componentDidMount () {
     this.resizeText()
@@ -36,33 +39,7 @@ class Rates extends React.Component {
   };
 
   render () {
-    const currencies = {
-      BTC: {
-        rub: '---',
-        usd: '---',
-        btc: '---'
-      },
-      LTC: {
-        rub: '---',
-        usd: '---',
-        btc: '---'
-      },
-      DASH: {
-        rub: '---',
-        usd: '---',
-        btc: '---'
-      },
-      ERA: {
-        rub: '---',
-        usd: '---',
-        btc: '---'
-      },
-      COMPU: {
-        rub: '---',
-        usd: '---',
-        btc: '---'
-      }
-    }
+    const currencies: {[string]: {[string]: number}} = {}
     for (let key in state.rates) {
       for (let currency2 of state.rates[key]) {
         if (!currencies.hasOwnProperty(currency2[1])) {
@@ -85,6 +62,11 @@ class Rates extends React.Component {
       return ''
     }
 
+    let intl = i18n.t('intl')
+    if (typeof intl !== 'string') {
+      intl = 'en-US'
+    }
+
     for (let key in currencies) {
       const currency = state.currencies.in[key]
       const rates = currencies[key]
@@ -93,13 +75,13 @@ class Rates extends React.Component {
           <img alt={key} style={{ width: '32px', height: '32px' }} className='curr-img' src={`http://face2face.cash/${state.icon_url}/${currency.icon}`} />
           <span className='curr-name'>{currency.name}</span>
         </div>
-        <span className='rate-usd'>{rates.rub.toLocaleString(i18n.t('intl'), {
+        <span className='rate-usd'>{rates.rub.toLocaleString(intl, {
           minimumFractionDigits: 2
         })} ₽</span>
-        <span className='rate-usd'>${rates.usd.toLocaleString(i18n.t('intl'), {
+        <span className='rate-usd'>${rates.usd.toLocaleString(intl, {
           minimumFractionDigits: 2
         })}</span>
-        <span className='rate-btc'>{rates.btc.toLocaleString(i18n.t('intl'), {
+        <span className='rate-btc'>{rates.btc.toLocaleString(intl, {
           minimumFractionDigits: 6
         })} BTC</span>
       </div>)

@@ -1,18 +1,23 @@
-import React from 'react'
+// @flow
+import * as React from 'react'
 import './Lightbox.scss'
 
-class Lightbox extends React.Component {
-  constructor (props) {
-    super(props)
-    this.state = {
-      show: false,
-      current: 0
-    }
-    this.popup = React.createRef()
-    this.handleClickOutside = this.handleClickOutside.bind(this)
-    this.handleKeyboard = this.handleKeyboard.bind(this)
-    this.go = this.go.bind(this)
+type PropTypes = {
+  open: boolean,
+  close: () => void,
+  content: Array<string>
+}
+type StateTypes = {
+  show: boolean,
+  current: number
+}
+
+class Lightbox extends React.Component<PropTypes, StateTypes> {
+  state = {
+    show: false,
+    current: 0
   }
+  popup: { current: null | HTMLDivElement } = React.createRef()
 
   componentDidMount () {
     if (this.props.open !== this.state.show) {
@@ -29,7 +34,7 @@ class Lightbox extends React.Component {
     document.removeEventListener('keydown', this.handleKeyboard)
   }
 
-  static getDerivedStateFromProps (props, state) {
+  static getDerivedStateFromProps (props: PropTypes, state: StateTypes) {
     if (props.open !== state.show) {
       return {
         show: props.open
@@ -38,13 +43,16 @@ class Lightbox extends React.Component {
     return null
   }
 
-  handleClickOutside (event) {
+  handleClickOutside = (event: MouseEvent) => {
+    if (!(event.target instanceof Node)) { // eslint-disable-line no-undef
+      return
+    }
     if (this.popup.current && !this.popup.current.contains(event.target)) {
       this.props.close()
     }
   }
 
-  handleKeyboard (event) {
+  handleKeyboard = (event: KeyboardEvent) => {
     switch (event.keyCode) {
     case 27:
       this.props.close()
@@ -61,7 +69,7 @@ class Lightbox extends React.Component {
     }
   }
 
-  go (direction) {
+  go = (direction: 'right' | 'left') => {
     const content = this.props.content
     let current = this.state.current
     if (direction === 'right') {

@@ -1,17 +1,20 @@
+// @flow
 import React from 'react'
 import { i18n } from '../../../state/i18n'
 import './AboutUs.scss'
 
-class AboutUs extends React.Component {
-  constructor (props) {
-    super(props)
-    this.state = {
-      headerSize: 52,
-      textSize: 18
-    }
-    this.container = React.createRef()
-    this.resizeText = this.resizeText.bind(this)
+type PropTypes = {||}
+type StateTypes = {
+  headerSize: number,
+  textSize: number
+}
+
+class AboutUs extends React.Component<PropTypes, StateTypes> {
+  state = {
+    headerSize: 52,
+    textSize: 18
   }
+  container: { current: null | HTMLDivElement } = React.createRef()
 
   componentDidMount () {
     this.resizeText()
@@ -24,7 +27,7 @@ class AboutUs extends React.Component {
     window.removeEventListener('resize', this.resizeText)
   }
 
-  resizeText () {
+  resizeText = () => {
     if (!this.container.current) {
       return
     }

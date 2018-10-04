@@ -1,3 +1,4 @@
+// @flow
 import React from 'react'
 import { view } from 'react-easy-state'
 import * as jsonpath from 'jsonpath'
@@ -6,23 +7,26 @@ import './SupportPage.scss'
 import Popup from '../../components/Popup/Popup'
 import Button from '../../components/Button/Button'
 
-class SupportPage extends React.Component {
-  constructor (props) {
-    super(props)
-    this.state = {
-      currentTab: 0,
-      headerSize: 116.25,
-      textSize: 14,
-      inputSize: 16,
-      popup: false
-    }
-    this.container = React.createRef()
-    this.switchTab = this.switchTab.bind(this)
-    this.resizeText = this.resizeText.bind(this)
-    this.submit = this.submit.bind(this)
-  }
+type PropTypes = {||}
+type StateTypes = {
+  currentTab: number,
+  headerSize: number,
+  textSize: number,
+  inputSize: number,
+  popup: boolean
+}
 
-  switchTab (id) {
+class SupportPage extends React.Component<PropTypes, StateTypes> {
+  state = {
+    currentTab: 0,
+    headerSize: 116.25,
+    textSize: 14,
+    inputSize: 16,
+    popup: false
+  }
+  container: { current: null | HTMLDivElement } = React.createRef()
+
+  switchTab = (id: number) => {
     this.setState({
       currentTab: id
     })
@@ -37,7 +41,7 @@ class SupportPage extends React.Component {
     window.removeEventListener('resize', this.resizeText)
   }
 
-  resizeText () {
+  resizeText = () => {
     if (!this.container.current) {
       return
     }
@@ -53,7 +57,7 @@ class SupportPage extends React.Component {
     })
   }
 
-  submit (event) {
+  submit = (event: SyntheticEvent<HTMLButtonElement>) => {
     event.preventDefault()
     this.setState({
       popup: true
@@ -86,7 +90,7 @@ class SupportPage extends React.Component {
       <div key='text' dangerouslySetInnerHTML={{ __html: jsonpath.value(translation, `supportPage.tabs[${this.state.currentTab}].text`) }} />
     ]
 
-    for (let key in tabTitles) {
+    for (let key = 0; key < tabTitles.length; key += 1) {
       // eslint-disable-next-line
       const active = (key == this.state.currentTab)?'active':'';
       tabListItems.push(<li key={key} className={active} onClick={() => this.switchTab(key)}>

@@ -1,3 +1,4 @@
+// @flow
 import React from 'react'
 import Header from '../../layout/header/Header'
 import { i18n } from '../../state/i18n'
@@ -5,7 +6,7 @@ import { Link } from 'react-router-dom'
 import { view } from 'react-easy-state'
 import './ErrorPage.scss'
 
-class ErrorPage extends React.Component {
+class ErrorPage extends React.Component<{}> {
   render () {
     return <div className='error-page'>
       <div className='cool-background'>

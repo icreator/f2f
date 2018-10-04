@@ -1,10 +1,15 @@
+// @flow
 import React from 'react'
 import { Link } from 'react-router-dom'
 import { i18n } from '../../state/i18n'
 import Menu from './Menu'
 import './Header.scss'
 
-export default class Header extends React.Component {
+type PropTypes = {
+  main: boolean
+}
+
+export default class Header extends React.Component<PropTypes> {
   render () {
     let className = 'header inner-header'
     let Logo = <Link className='logo' to='/'><img alt={i18n.t('logo.alt')} src='/img/logo.png' /></Link>

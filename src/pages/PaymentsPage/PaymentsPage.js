@@ -1,5 +1,6 @@
 // @flow
 import React from 'react'
+import { withRouter } from 'react-router'
 import { view } from 'react-easy-state'
 import { fetch } from 'whatwg-fetch'
 import { i18n } from '../../state/i18n'
@@ -10,69 +11,110 @@ import './PaymentsPage.scss'
 
 type HistoryResponse = {
   error?: string,
+  deal_acc: {
+    gift_amount: number,
+    gift_payed: number,
+    gift_pick: number,
+    curr_out_id: number
+  },
   done: Array<{
     acc: string,
-    pay_out: {
+    pay_out?: {
       created_on: string,
       amount: number,
       vars: {
         status: "success"
       }
     },
-    curr_in: string,
-    pay_in: {
-      amount: number,
-      stasus: "ok",
-      txid: string
+    curr_in: {
+      abbrev: string,
+      id: number
     },
-    curr_in_id: number,
-    curr_out_id: number,
-    curr_out: string
+    curr_out: {
+      abbrev: string,
+      id: number
+    },
+    amount_in: number,
+    stasus: "ok" | "added",
+    txid: string,
+    status_mess: string
   }>
 }
 
-type State = {
+type StateTypes = {
+  lastSearch: string,
   search: string,
   focus: boolean,
   data: Array<{
     sent: number,
     sentCurrency: string,
-    statusIn: 'pending' | 'complete',
+    statusIn: 'pending' | 'complete' | 'none',
     // rate: number,
     received: number,
     receivedCurrency: string,
-    statusOut: ?('pending' | 'complete'),
-    inTxId: string
+    statusOut: 'pending' | 'complete' | 'none',
+    inTxId: string,
   }>,
+  messageData: {
+    gift_amount: number,
+    gift_payed: number,
+    gift_pick: number,
+    currency: string
+  },
   error: ?string,
   loading: boolean
+}
+
+type PropTypes = {
+  match: {
+    params: {
+      currency?: string,
+      wallet?: string
+    }
+  },
+  history: {
+    push: (string) => void
+  }
 }
 
 const abortableFetch: typeof fetch = ('signal' in new window.Request('')) ? window.fetch : fetch
 const NewAbortController: ?typeof AbortController = ('AbortController' in window) ? window.AbortController : AbortController
 
-class PaymentsPage extends React.Component<{}, State> {
+class PaymentsPage extends React.Component<PropTypes, StateTypes> {
   state = {
+    lastSearch: '',
     search: '',
     focus: false,
     data: [],
+    messageData: {
+      gift_amount: 0,
+      gift_payed: 0,
+      gift_pick: 0,
+      currency: ''
+    },
     error: null,
     loading: false
   }
 
   abortController: ?AbortController = undefined
 
-  performSearch = (event: SyntheticInputEvent<HTMLInputElement>) => {
+  performSearch = () => {
     this.setState({
-      search: event.target.value,
+      lastSearch: this.state.search,
       error: null,
-      loading: true
+      loading: true,
+      messageData: {
+        gift_amount: 0,
+        gift_payed: 0,
+        gift_pick: 0,
+        currency: ''
+      }
     })
     let signal
     if (this.abortController) {
       this.abortController.abort()
     }
-    if (event.target.value === '') {
+    if (this.state.search === '') {
       this.setState({
         error: null,
         loading: false,
@@ -85,7 +127,7 @@ class PaymentsPage extends React.Component<{}, State> {
     }
     this.abortController = new NewAbortController()
     signal = this.abortController.signal
-    abortableFetch(`${state.serverName}/apipay/history.json/${event.target.value}`, {
+    abortableFetch(`${state.serverName}/apipay/history.json/${this.state.search}`, {
       signal
     })
       .then(result => result.json())
@@ -100,18 +142,30 @@ class PaymentsPage extends React.Component<{}, State> {
         const data = []
         for (let row of result.done) {
           data.push({
-            sent: row.pay_in.amount,
-            sentCurrency: row.curr_in,
-            statusIn: (row.pay_in.stasus === 'ok') ? 'complete' : 'pending',
+            sent: row.amount_in,
+            sentCurrency: row.curr_in.abbrev,
+            statusIn: ((row.stasus === 'ok' || row.stasus === 'added') ? 'complete' : 'pending'),
             // rate: row. // TODO: Add Rate
-            received: row.pay_out.amount,
-            receivedCurrency: row.curr_out,
-            statusOut: (row.pay_out.vars.status === 'success') ? 'complete' : 'pending',
-            inTxId: row.pay_in.txid
+            received: (row.pay_out ? row.pay_out.amount : parseFloat(row.status_mess)),
+            receivedCurrency: row.curr_out.abbrev,
+            statusOut: (row.pay_out ? (row.pay_out.vars.status === 'success') ? 'complete' : 'pending' : 'none'),
+            inTxId: row.txid
           })
+        }
+        let currency = ''
+        for (let key in state.currencies.out) {
+          if (state.currencies.out[key].id === result.deal_acc.curr_out_id) {
+            currency = key
+          }
         }
         this.setState({
           data,
+          messageData: {
+            gift_amount: result.deal_acc.gift_amount,
+            gift_payed: result.deal_acc.gift_payed,
+            gift_pick: result.deal_acc.gift_pick,
+            currency
+          },
           loading: false
         })
       })
@@ -127,8 +181,34 @@ class PaymentsPage extends React.Component<{}, State> {
       })
   }
 
+  static getDerivedStateFromProps (props: PropTypes, state: StateTypes) {
+    let search = ''
+    if (props.match.params.currency) {
+      search += `${props.match.params.currency}/`
+    }
+    if (props.match.params.wallet) {
+      search += props.match.params.wallet
+    }
+    return {
+      search
+    }
+  }
+
+  componentDidMount () {
+    if (this.state.search !== '') {
+      this.performSearch()
+    }
+  }
+
+  componentDidUpdate () {
+    if (this.state.search !== this.state.lastSearch) {
+      this.performSearch()
+    }
+  }
+
   render () {
-    const { search, data, error, loading } = this.state
+    console.log(this.props.match)
+    const { search, messageData, data, error, loading } = this.state
 
     let results = <span className='not-found' />
 
@@ -140,12 +220,15 @@ class PaymentsPage extends React.Component<{}, State> {
         string = i18n.t('payments_page.generalError')
       } else if (/wrong address/.exec(string)) {
         string = i18n.t('payments_page.wrong_address')
-      } else if (/Deals not found/.exec(string)) {
+      } else if (/Deals not found/.exec(string) || /Use ABBREV\/ACCOUNT/.exec(string)) {
         string = i18n.t('payments_page.nothing_found')
       }
       results = <span className='not-found'>{string}</span>
-    } else if (data.length > 0) {
+    } else if (data.length === 0) {
+      results = <span className='not-found'>{i18n.t('payments_page.nothing_found')}</span>
+    } else {
       const rows = []
+      let message = ''
       for (let row of data) {
         rows.push(<tr key={row.inTxId}>
           <td>
@@ -170,26 +253,37 @@ class PaymentsPage extends React.Component<{}, State> {
         </tr>)
       }
 
-      results = <table className='search-table'>
-        <thead>
-          <tr>
-            {/* <th>{i18n.t('payments_page.table.date')}</th> */}
-            <th>{i18n.t('payments_page.table.sent')}</th>
-            <th />
-            {/* <th>{i18n.t('payments_page.table.rate')}</th> */}
-            <th>{i18n.t('payments_page.table.received')}</th>
-            <th />
-          </tr>
-        </thead>
-        <tbody>
-          {rows}
-          {/* <tr>
-            <td colSpan='6'>
-              <button className='show-more'>{i18n.t('payments_page.table.show_more')}</button>
-            </td>
-          </tr> */}
-        </tbody>
-      </table>
+      if (messageData.gift_amount > 0) {
+        message = <h3 className='gift_info'>
+          {i18n.t('payments_page.gift_info_header', {
+            giftAmount: `${messageData.gift_amount}`
+          })}
+        </h3>
+      }
+
+      results = [
+        message,
+        <table className='search-table'>
+          <thead>
+            <tr>
+              {/* <th>{i18n.t('payments_page.table.date')}</th> */}
+              <th>{i18n.t('payments_page.table.sent')}</th>
+              <th />
+              {/* <th>{i18n.t('payments_page.table.rate')}</th> */}
+              <th>{i18n.t('payments_page.table.received')}</th>
+              <th />
+            </tr>
+          </thead>
+          <tbody>
+            {rows}
+            {/* <tr>
+              <td colSpan='6'>
+                <button className='show-more'>{i18n.t('payments_page.table.show_more')}</button>
+              </td>
+            </tr> */}
+          </tbody>
+        </table>
+      ]
     }
 
     return <div className='payments-page container-950'>
@@ -199,7 +293,9 @@ class PaymentsPage extends React.Component<{}, State> {
           className='search-bar'
           value={search}
           onChange={() => {}} // React shows error that field is readOnly, but I use onInput!
-          onInput={this.performSearch}
+          onInput={(e: SyntheticEvent<HTMLInputElement>) => {
+            this.props.history.push(`/payments/${e.currentTarget.value}`)
+          }}
           placeholder={i18n.t('payments_page.search_placeholder')}
           onFocus={() => this.setState({
             focus: true
@@ -214,4 +310,4 @@ class PaymentsPage extends React.Component<{}, State> {
   }
 }
 
-export default view(PaymentsPage)
+export default withRouter(view(PaymentsPage))

@@ -54,7 +54,7 @@ class ExchangeForm extends React.Component<PropTypes, StateTypes> {
       this.props.onChange()
     }
     let availableAmountOut = state.getAvailableAmount(currOutId)
-    this.loadRate(currInId, currOutId, parseInt(amountIn))
+    this.loadRate(currInId, currOutId, amountIn)
       .then(({ volume_out: amountOut, rate }) => {
         let exceeded = false
         if (!availableAmountOut) {
@@ -85,12 +85,16 @@ class ExchangeForm extends React.Component<PropTypes, StateTypes> {
   setInAmount = (event: SyntheticEvent<HTMLInputElement>) => {
     const amountIn = event.currentTarget.value
     const { in: currIn, out: currOut } = state.calculator
+    let amountInNum = parseFloat(amountIn)
+    if (isNaN(amountInNum)) {
+      amountInNum = 0
+    }
     state.calculator = {
       ...state.calculator,
       amountIn,
-      usdValue: parseFloat(amountIn) * state.getRate('usd', currIn.code)
+      usdValue: amountInNum * state.getRate('usd', currIn.code)
     }
-    this.recalculateOutAmount(currIn.id, currOut.id, amountIn)
+    this.recalculateOutAmount(currIn.id, currOut.id, amountInNum)
   };
 
   setOutAmount = (event) => {
@@ -103,12 +107,16 @@ class ExchangeForm extends React.Component<PropTypes, StateTypes> {
     icon: string
   }) => {
     const { out, amountIn } = state.calculator
+    let amountInNum = parseFloat(amountIn)
+    if (isNaN(amountInNum)) {
+      amountInNum = 0
+    }
     state.calculator = {
       ...state.calculator,
       in: currIn,
-      usdValue: parseFloat(amountIn) * state.getRate('usd', currIn.code)
+      usdValue: amountInNum * state.getRate('usd', currIn.code)
     }
-    this.recalculateOutAmount(currIn.id, out.id, amountIn)
+    this.recalculateOutAmount(currIn.id, out.id, amountInNum)
   };
 
   setOut = (out: {
@@ -118,11 +126,15 @@ class ExchangeForm extends React.Component<PropTypes, StateTypes> {
     code: string
   }) => {
     const { in: currIn, amountIn } = state.calculator
+    let amountInNum = parseFloat(amountIn)
+    if (isNaN(amountInNum)) {
+      amountInNum = 0
+    }
     state.calculator = {
       ...state.calculator,
       out
     }
-    this.recalculateOutAmount(currIn.id, out.id, amountIn)
+    this.recalculateOutAmount(currIn.id, out.id, amountInNum)
   };
 
   swap = () => {

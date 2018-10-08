@@ -23,6 +23,8 @@ class App extends React.Component<{}> {
         <PreloaderRoute exact path='/' bundles={['index']} component={IndexPage} />
         <DefaultLayout bundles={['exchange']} path='/exchange' component={ExchangePage} />
         <DefaultLayout bundles={['support']} path='/support' component={SupportPage} />
+        <DefaultLayout bundles={['payments']} path='/payments/:currency/:wallet' component={PaymentsPage} />
+        <DefaultLayout bundles={['payments']} path='/payments/:wallet' component={PaymentsPage} />
         <DefaultLayout bundles={['payments']} path='/payments' component={PaymentsPage} />
         <PreloaderRoute path='*' bundles={['index']} component={ErrorPage} />
       </Switch>

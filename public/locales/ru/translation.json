@@ -115,7 +115,8 @@
       "received": "Получил",
       "block_explorer_link": "Block explorer",
       "show_more": "Показать ещё"
-    }
+    },
+    "gift_info_header": "Поздравляем! У вас есть подарок {giftAmount}₽"
   },
   "supportPage": {
     "tabs": [

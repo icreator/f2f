@@ -399,7 +399,7 @@ class ExchangePage extends React.Component<PropTypes, StateTypes> {
         <p>
           {i18n.t('exchange.success.message[2]')}
         </p>
-        <Link to='/payments' className='btn'>{i18n.t('exchange.success.payments_button')}</Link>
+        <Link to={`/payments/${state.calculator.out.code}/${this.state.out_wallet}`} className='btn'>{i18n.t('exchange.success.payments_button')}</Link>
       </div>}
       <Popup
         open={this.state.qr}

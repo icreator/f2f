@@ -52,7 +52,7 @@ type StateTypes = {
     // rate: number,
     received: number,
     receivedCurrency: string,
-    statusOut: 'pending' | 'complete' | 'none',
+    statusOut: 'pending' | 'complete' | 'added' | 'none',
     inTxId: string,
   }>,
   messageData: {
@@ -148,7 +148,7 @@ class PaymentsPage extends React.Component<PropTypes, StateTypes> {
             // rate: row. // TODO: Add Rate
             received: (row.pay_out ? row.pay_out.amount : parseFloat(row.status_mess)),
             receivedCurrency: row.curr_out.abbrev,
-            statusOut: (row.pay_out ? (row.pay_out.vars.status === 'success') ? 'complete' : 'pending' : 'none'),
+            statusOut: (row.pay_out ? (row.pay_out.vars.status === 'success') ? 'complete' : 'pending' : (row.stasus === 'added') ? 'added' : 'none'),
             inTxId: row.txid
           })
         }
@@ -236,8 +236,8 @@ class PaymentsPage extends React.Component<PropTypes, StateTypes> {
             {/* <a href='' target='_blank'>{i18n.t('payments_page.table.block_explorer_link')}</a> */}
           </td>
           <td>
-            {row.statusIn === 'pending' && <img alt='' src='/img/payment-pending.png' />}
-            {row.statusIn === 'complete' && <img alt='' src='/img/payment-confirmed.png' />}
+            {row.statusIn === 'pending' && <img alt={i18n.t('payments_page.table.status.pending')} title={i18n.t('payments_page.table.status.pending')} src='/img/payment-pending.png' />}
+            {row.statusIn === 'complete' && <img alt={i18n.t('payments_page.table.status.complete')} title={i18n.t('payments_page.table.status.complete')} src='/img/payment-confirmed.png' />}
           </td>
           {/* <td>
             {row.rate}
@@ -247,8 +247,9 @@ class PaymentsPage extends React.Component<PropTypes, StateTypes> {
             {/* <a href='' target='_blank'>{i18n.t('payments_page.table.block_explorer_link')}</a> */}
           </td>
           <td>
-            {row.statusOut === 'pending' && <img alt='' src='/img/payment-pending.png' />}
-            {row.statusOut === 'complete' && <img alt='' src='/img/payment-confirmed.png' />}
+            {row.statusOut === 'pending' && <img alt={i18n.t('payments_page.table.status.pending')} title={i18n.t('payments_page.table.status.pending')} src='/img/payment-pending.png' />}
+            {row.statusOut === 'added' && <img alt={i18n.t('payments_page.table.status.added')} title={i18n.t('payments_page.table.status.added')} src='/img/payment-added.png' />}
+            {row.statusOut === 'complete' && <img alt={i18n.t('payments_page.table.status.complete')} title={i18n.t('payments_page.table.status.complete')} src='/img/payment-confirmed.png' />}
           </td>
         </tr>)
       }

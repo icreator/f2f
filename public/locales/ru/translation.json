@@ -114,7 +114,12 @@
       "rate": "Курс",
       "received": "Получил",
       "block_explorer_link": "Block explorer",
-      "show_more": "Показать ещё"
+      "show_more": "Показать ещё",
+      "status": {
+        "pending": "В обработке",
+        "added": "Платёж меньше суммы комиссии, добавлен к следующим выплатам",
+        "complete": "Выполнен"
+      }
     },
     "gift_info_header": "Поздравляем! У вас есть подарок {giftAmount}₽"
   },

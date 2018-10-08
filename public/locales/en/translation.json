@@ -114,7 +114,12 @@
       "rate": "Rate",
       "received": "Received",
       "block_explorer_link": "Block explorer",
-      "show_more": "Show more"
+      "show_more": "Show more",
+      "status": {
+        "pending": "Pending",
+        "added": "Amount is lower than comission, and will be added to next payment",
+        "complete": "Complete"
+      }
     },
     "gift_info_header": "Congratulations! You have a gift of {giftAmount}₽"
   },

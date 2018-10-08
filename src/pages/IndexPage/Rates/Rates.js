@@ -75,15 +75,15 @@ class Rates extends React.Component<PropTypes, StateTypes> {
           <img alt={key} style={{ width: '32px', height: '32px' }} className='curr-img' src={`http://face2face.cash/${state.icon_url}/${currency.icon}`} />
           <span className='curr-name'>{currency.name}</span>
         </div>
-        <span className='rate-usd'>{rates.rub.toLocaleString(intl, {
+        <span className='rate-usd'>{rates.rub ? rates.rub.toLocaleString(intl, {
           minimumFractionDigits: 2
-        })} ₽</span>
-        <span className='rate-usd'>${rates.usd.toLocaleString(intl, {
+        }) : '---'} ₽</span>
+        <span className='rate-usd'>${rates.usd ? rates.usd.toLocaleString(intl, {
           minimumFractionDigits: 2
-        })}</span>
-        <span className='rate-btc'>{rates.btc.toLocaleString(intl, {
+        }) : '---'}</span>
+        <span className='rate-btc'>{rates.btc ? rates.btc.toLocaleString(intl, {
           minimumFractionDigits: 6
-        })} BTC</span>
+        }) : '---'} BTC</span>
       </div>)
     }
 

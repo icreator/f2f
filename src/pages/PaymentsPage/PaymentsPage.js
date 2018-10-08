@@ -19,9 +19,13 @@ type HistoryResponse = {
   },
   done: Array<{
     acc: string,
+    created: string,
     pay_out?: {
       created_on: string,
       amount: number,
+      amo_gift: number,
+      amo_partner: number,
+      amo_to_pay: number,
       vars: {
         status: "success"
       }
@@ -35,10 +39,39 @@ type HistoryResponse = {
       id: number
     },
     amount_in: number,
-    stasus: "ok" | "added",
+    stasus: "ok" | "added" | "wait",
     txid: string,
     status_mess: string
-  }>
+  }>,
+  in_process: Array<{
+    acc: string,
+    created: string,
+    curr_in: {
+      abbrev: string,
+      id: number
+    },
+    curr_out: {
+      abbrev: string,
+      id: number
+    },
+    amount_in: number,
+    stasus: "ok" | "added" | "wait",
+    txid: string,
+    status_mess: string
+  }>,
+  unconfirmed: Array<[
+    {
+      abbrev: string,
+      id: number
+    },
+    string,
+    string,
+    number,
+    number,
+    number,
+    string,
+    string
+  ]>
 }
 
 type StateTypes = {
@@ -46,14 +79,19 @@ type StateTypes = {
   search: string,
   focus: boolean,
   data: Array<{
-    sent: number,
+    date: string,
+    sent: number | string,
     sentCurrency: string,
     statusIn: 'pending' | 'complete' | 'none',
-    // rate: number,
-    received: number,
+    received: number | string,
     receivedCurrency: string,
     statusOut: 'pending' | 'complete' | 'added' | 'none',
     inTxId: string,
+    amoGift: number,
+    amoToPay: number,
+    amoPartner: number,
+    rawStatus: string,
+    rawStatusMess: string
   }>,
   messageData: {
     gift_amount: number,
@@ -62,7 +100,8 @@ type StateTypes = {
     currency: string
   },
   error: ?string,
-  loading: boolean
+  loading: boolean,
+  debug: boolean
 }
 
 type PropTypes = {
@@ -93,7 +132,8 @@ class PaymentsPage extends React.Component<PropTypes, StateTypes> {
       currency: ''
     },
     error: null,
-    loading: false
+    loading: false,
+    debug: false
   }
 
   abortController: ?AbortController = undefined
@@ -127,7 +167,7 @@ class PaymentsPage extends React.Component<PropTypes, StateTypes> {
     }
     this.abortController = new NewAbortController()
     signal = this.abortController.signal
-    abortableFetch(`${state.serverName}/apipay/history.json/${this.state.search}`, {
+    abortableFetch(`${state.serverName}/apipay/history.json/${this.state.search.replace(/:/, '/').replace(/^_+/, '')}`, {
       signal
     })
       .then(result => result.json())
@@ -140,16 +180,55 @@ class PaymentsPage extends React.Component<PropTypes, StateTypes> {
           return
         }
         const data = []
+        for (let row of result.unconfirmed) {
+          data.push({
+            sent: row[1],
+            sentCurrency: row[0].abbrev,
+            statusIn: 'pending',
+            received: '',
+            receivedCurrency: '',
+            statusOut: 'none',
+            inTxId: row[2],
+            date: row[6],
+            amoGift: 0,
+            amoToPay: 0,
+            amoPartner: 0,
+            rawStatus: 'unconfirmed',
+            rawStatusMess: ''
+          })
+        }
+        for (let row of result.in_process) {
+          data.push({
+            sent: row.amount_in,
+            sentCurrency: row.curr_in.abbrev,
+            statusIn: ((row.stasus === 'ok' || row.stasus === 'added') ? 'complete' : 'pending'),
+            received: '',
+            amoGift: 0,
+            amoToPay: 0,
+            amoPartner: 0,
+            receivedCurrency: '',
+            statusOut: 'none',
+            inTxId: row.txid,
+            date: row.created,
+            rawStatus: row.stasus,
+            rawStatusMess: row.status_mess
+          })
+        }
         for (let row of result.done) {
           data.push({
             sent: row.amount_in,
             sentCurrency: row.curr_in.abbrev,
             statusIn: ((row.stasus === 'ok' || row.stasus === 'added') ? 'complete' : 'pending'),
-            // rate: row. // TODO: Add Rate
             received: (row.pay_out ? row.pay_out.amount : parseFloat(row.status_mess)),
+            amoGift: (row.pay_out ? row.pay_out.amo_gift : 0),
+            amoToPay: (row.pay_out ? row.pay_out.amo_to_pay : 0),
+            amoPartner: (row.pay_out ? row.pay_out.amo_partner : 0),
             receivedCurrency: row.curr_out.abbrev,
             statusOut: (row.pay_out ? (row.pay_out.vars.status === 'success') ? 'complete' : 'pending' : (row.stasus === 'added') ? 'added' : 'none'),
-            inTxId: row.txid
+            inTxId: row.txid,
+            date: row.created,
+            rawStatus: row.stasus,
+            rawStatusMess: row.status_mess
           })
         }
         let currency = ''
@@ -183,13 +262,20 @@ class PaymentsPage extends React.Component<PropTypes, StateTypes> {
 
   static getDerivedStateFromProps (props: PropTypes, state: StateTypes) {
     let search = ''
+    let debug = false
     if (props.match.params.currency) {
-      search += `${props.match.params.currency}/`
+      if (/^___/.test(props.match.params.currency)) {
+        debug = true
+      }
+      if (props.match.params.currency) {
+        search += `${props.match.params.currency.replace(/^___/, '')}:`
+      }
     }
     if (props.match.params.wallet) {
       search += props.match.params.wallet
     }
     return {
+      debug,
       search
     }
   }
@@ -207,7 +293,6 @@ class PaymentsPage extends React.Component<PropTypes, StateTypes> {
   }
 
   render () {
-    console.log(this.props.match)
     const { search, messageData, data, error, loading } = this.state
 
     let results = <span className='not-found' />
@@ -230,32 +315,40 @@ class PaymentsPage extends React.Component<PropTypes, StateTypes> {
       const rows = []
       let message = ''
       for (let row of data) {
+        let receivedString = <span>
+          {row.received} {row.receivedCurrency}<br />
+          {row.amoGift > 0 && ['+', i18n.t('payments_page.table.gift'), ' ', row.amoGift, ' ', row.receivedCurrency, <br key='br' />]}
+          {row.amoToPay > 0 && ['+', i18n.t('payments_page.table.debt'), ' ', row.amoToPay, ' ', row.receivedCurrency, <br key='br' />]}
+          {row.amoPartner > 0 && ['+', i18n.t('payments_page.table.partner'), ' ', row.amoPartner, ' ', row.receivedCurrency, <br key='br' />]}
+        </span>
         rows.push(<tr key={row.inTxId}>
           <td>
+            {row.date}
+          </td>
+          <td>
             {row.sent} {row.sentCurrency}<br />
-            {/* <a href='' target='_blank'>{i18n.t('payments_page.table.block_explorer_link')}</a> */}
           </td>
           <td>
             {row.statusIn === 'pending' && <img alt={i18n.t('payments_page.table.status.pending')} title={i18n.t('payments_page.table.status.pending')} src='/img/payment-pending.png' />}
             {row.statusIn === 'complete' && <img alt={i18n.t('payments_page.table.status.complete')} title={i18n.t('payments_page.table.status.complete')} src='/img/payment-confirmed.png' />}
           </td>
-          {/* <td>
-            {row.rate}
-          </td> */}
           <td>
-            {row.received} {row.receivedCurrency}<br />
-            {/* <a href='' target='_blank'>{i18n.t('payments_page.table.block_explorer_link')}</a> */}
+            {receivedString}
           </td>
           <td>
             {row.statusOut === 'pending' && <img alt={i18n.t('payments_page.table.status.pending')} title={i18n.t('payments_page.table.status.pending')} src='/img/payment-pending.png' />}
             {row.statusOut === 'added' && <img alt={i18n.t('payments_page.table.status.added')} title={i18n.t('payments_page.table.status.added')} src='/img/payment-added.png' />}
             {row.statusOut === 'complete' && <img alt={i18n.t('payments_page.table.status.complete')} title={i18n.t('payments_page.table.status.complete')} src='/img/payment-confirmed.png' />}
           </td>
+          {this.state.debug && <td>
+            {row.rawStatus}<br />
+            {row.rawStatusMess}
+          </td>}
         </tr>)
       }
 
       if (messageData.gift_amount > 0) {
-        message = <h3 className='gift_info'>
+        message = <h3 key='gift_header' className='gift_info'>
           {i18n.t('payments_page.gift_info_header', {
             giftAmount: `${messageData.gift_amount}`
           })}
@@ -264,24 +357,19 @@ class PaymentsPage extends React.Component<PropTypes, StateTypes> {
 
       results = [
         message,
-        <table className='search-table'>
+        <table key='table' className='search-table'>
           <thead>
             <tr>
-              {/* <th>{i18n.t('payments_page.table.date')}</th> */}
+              {<th>{i18n.t('payments_page.table.date')}</th>}
               <th>{i18n.t('payments_page.table.sent')}</th>
               <th />
-              {/* <th>{i18n.t('payments_page.table.rate')}</th> */}
               <th>{i18n.t('payments_page.table.received')}</th>
               <th />
+              {this.state.debug && <th />}
             </tr>
           </thead>
           <tbody>
             {rows}
-            {/* <tr>
-              <td colSpan='6'>
-                <button className='show-more'>{i18n.t('payments_page.table.show_more')}</button>
-              </td>
-            </tr> */}
           </tbody>
         </table>
       ]
@@ -295,7 +383,10 @@ class PaymentsPage extends React.Component<PropTypes, StateTypes> {
           value={search}
           onChange={() => {}} // React shows error that field is readOnly, but I use onInput!
           onInput={(e: SyntheticEvent<HTMLInputElement>) => {
-            this.props.history.push(`/payments/${e.currentTarget.value}`)
+            e.currentTarget.value = e.currentTarget.value.replace(/[^A-Za-z0-9:_]/g, '')
+            let string = e.currentTarget.value.replace(/\//g, ':')
+            string = string.replace(/:/, '/')
+            this.props.history.push(`/payments/${string}`)
           }}
           placeholder={i18n.t('payments_page.search_placeholder')}
           onFocus={() => this.setState({

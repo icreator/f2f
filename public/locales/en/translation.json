@@ -119,7 +119,10 @@
         "pending": "Pending",
         "added": "Amount is lower than comission, and will be added to next payment",
         "complete": "Complete"
-      }
+      },
+      "gift": "gift",
+      "debt": "from previous payments",
+      "partner": "partner"
     },
     "gift_info_header": "Congratulations! You have a gift of {giftAmount}₽"
   },

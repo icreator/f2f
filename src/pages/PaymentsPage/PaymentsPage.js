@@ -48,7 +48,7 @@ type StateTypes = {
   data: Array<{
     sent: number,
     sentCurrency: string,
-    statusIn: 'ok' | 'added' | '',
+    statusIn: 'pending' | 'complete' | 'none',
     // rate: number,
     received: number,
     receivedCurrency: string,
@@ -144,7 +144,7 @@ class PaymentsPage extends React.Component<PropTypes, StateTypes> {
           data.push({
             sent: row.amount_in,
             sentCurrency: row.curr_in.abbrev,
-            statusIn: (row.stasus === 'ok' ? 'complete' : 'pending'),
+            statusIn: ((row.stasus === 'ok' || row.stasus === 'added') ? 'complete' : 'pending'),
             // rate: row. // TODO: Add Rate
             received: (row.pay_out ? row.pay_out.amount : parseFloat(row.status_mess)),
             receivedCurrency: row.curr_out.abbrev,

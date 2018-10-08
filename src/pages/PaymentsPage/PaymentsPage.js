@@ -256,8 +256,7 @@ class PaymentsPage extends React.Component<PropTypes, StateTypes> {
       if (messageData.gift_amount > 0) {
         message = <h3 className='gift_info'>
           {i18n.t('payments_page.gift_info_header', {
-            giftAmount: `${messageData.gift_amount}`,
-            currency: `${messageData.currency}`
+            giftAmount: `${messageData.gift_amount}`
           })}
         </h3>
       }
@@ -311,4 +310,4 @@ class PaymentsPage extends React.Component<PropTypes, StateTypes> {
   }
 }
 
-export default view(withRouter(PaymentsPage))
+export default withRouter(view(PaymentsPage))

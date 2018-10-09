@@ -120,11 +120,11 @@ type PropTypes = {
 
 const abortableFetch: typeof fetch = ('signal' in new window.Request('')) ? window.fetch : fetch
 const NewAbortController: ?typeof AbortController = ('AbortController' in window) ? window.AbortController : AbortController
-function convert (n: number): string {
+function convert (n: number): number {
   const string = n.toString()
   console.log(string)
   if (!/e/.exec(string)) {
-    return n.toString()
+    return n
   }
   let lead: string, decimal: string, pow: string
   if (/\./.exec(string)) {
@@ -134,8 +134,8 @@ function convert (n: number): string {
     decimal = ''
   }
   return +pow <= 0
-    ? '0.' + '0'.repeat(Math.abs(+pow) - 1) + lead + decimal
-    : lead + (+pow >= decimal.length ? (decimal + '0'.repeat(+pow - decimal.length)) : (decimal.slice(0, +pow) + '.' + decimal.slice(+pow)))
+    ? parseFloat('0.' + '0'.repeat(Math.abs(+pow) - 1) + lead + decimal)
+    : parseFloat(lead + (+pow >= decimal.length ? (decimal + '0'.repeat(+pow - decimal.length)) : (decimal.slice(0, +pow) + '.' + decimal.slice(+pow))))
 }
 
 class PaymentsPage extends React.Component<PropTypes, StateTypes> {

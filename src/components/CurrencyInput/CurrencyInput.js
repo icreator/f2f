@@ -44,8 +44,12 @@ class CurrencyInput extends React.Component<PropTypes, StateTypes> {
   };
 
   onInput = (event: SyntheticEvent<HTMLInputElement>) => {
-    const startingValue: string = event.currentTarget.value
+    let startingValue: string = event.currentTarget.value
     event.currentTarget.value = event.currentTarget.value.replace(/[^0-9.]/g, '')
+    if (/^0(\d)/.exec(event.currentTarget.value)) {
+      event.currentTarget.value = event.currentTarget.value.replace(/^0(\d)/, '$1')
+      startingValue = event.currentTarget.value
+    }
     if (/(\d*\.\d*)\.(\d*)/g.exec(event.currentTarget.value)) {
       event.currentTarget.value = event.currentTarget.value.replace(/(\d*\.\d*)\.(\d*)/gm, '$1$2')
     }

@@ -124,7 +124,8 @@
       "debt": "доплата",
       "partner": "партнёр"
     },
-    "gift_info_header": "Поздравляем! У вас есть подарок {giftAmount}₽"
+    "gift_info_header": "Поздравляем! У вас есть подарок {giftAmount} {currency}",
+    "gift_info_text": "У вас есть шанс получить {giftPick} {currency} при следующем обмене. Вами уже получено {giftPayed} {currency}"
   },
   "supportPage": {
     "tabs": [

@@ -124,7 +124,8 @@
       "debt": "from previous payments",
       "partner": "partner"
     },
-    "gift_info_header": "Congratulations! You have a gift of {giftAmount}₽"
+    "gift_info_header": "Congratulations! You have a gift of {giftAmount} {currency}",
+    "gift_info_text": "You have a chance to get {giftPick} {currency} with next exchange. You have already recieved {giftPayed} {currency}"
   },
   "supportPage": {
     "tabs": [

@@ -26,6 +26,7 @@ type HistoryResponse = {
       amo_gift: number,
       amo_partner: number,
       amo_to_pay: number,
+      amo_taken: number,
       vars: {
         status: "success"
       }
@@ -90,6 +91,7 @@ type StateTypes = {
     amoGift: number,
     amoToPay: number,
     amoPartner: number,
+    amoTaken: number,
     rawStatus: string,
     rawStatusMess: string
   }>,
@@ -118,6 +120,23 @@ type PropTypes = {
 
 const abortableFetch: typeof fetch = ('signal' in new window.Request('')) ? window.fetch : fetch
 const NewAbortController: ?typeof AbortController = ('AbortController' in window) ? window.AbortController : AbortController
+function convert (n: number): string {
+  const string = n.toString()
+  console.log(string)
+  if (!/e/.exec(string)) {
+    return n.toString()
+  }
+  let lead: string, decimal: string, pow: string
+  if (/\./.exec(string)) {
+    [lead, decimal, pow] = n.toString().split(/e|\./)
+  } else {
+    [lead, pow] = n.toString().split(/e/)
+    decimal = ''
+  }
+  return +pow <= 0
+    ? '0.' + '0'.repeat(Math.abs(+pow) - 1) + lead + decimal
+    : lead + (+pow >= decimal.length ? (decimal + '0'.repeat(+pow - decimal.length)) : (decimal.slice(0, +pow) + '.' + decimal.slice(+pow)))
+}
 
 class PaymentsPage extends React.Component<PropTypes, StateTypes> {
   state = {
@@ -193,6 +212,7 @@ class PaymentsPage extends React.Component<PropTypes, StateTypes> {
             amoGift: 0,
             amoToPay: 0,
             amoPartner: 0,
+            amoTaken: 0,
             rawStatus: 'unconfirmed',
             rawStatusMess: ''
           })
@@ -206,6 +226,7 @@ class PaymentsPage extends React.Component<PropTypes, StateTypes> {
             amoGift: 0,
             amoToPay: 0,
             amoPartner: 0,
+            amoTaken: 0,
             receivedCurrency: '',
             statusOut: 'none',
             inTxId: row.txid,
@@ -223,6 +244,7 @@ class PaymentsPage extends React.Component<PropTypes, StateTypes> {
             amoGift: (row.pay_out ? row.pay_out.amo_gift : 0),
             amoToPay: (row.pay_out ? row.pay_out.amo_to_pay : 0),
             amoPartner: (row.pay_out ? row.pay_out.amo_partner : 0),
+            amoTaken: (row.pay_out ? row.pay_out.amo_taken : 0),
             receivedCurrency: row.curr_out.abbrev,
             statusOut: (row.pay_out ? (row.pay_out.vars.status === 'success') ? 'complete' : 'pending' : (row.stasus === 'added') ? 'added' : 'none'),
             inTxId: row.txid,
@@ -240,9 +262,9 @@ class PaymentsPage extends React.Component<PropTypes, StateTypes> {
         this.setState({
           data,
           messageData: {
-            gift_amount: result.deal_acc.gift_amount,
-            gift_payed: result.deal_acc.gift_payed,
-            gift_pick: result.deal_acc.gift_pick,
+            gift_amount: convert(result.deal_acc.gift_amount),
+            gift_payed: convert(result.deal_acc.gift_payed),
+            gift_pick: convert(result.deal_acc.gift_pick),
             currency
           },
           loading: false
@@ -320,6 +342,7 @@ class PaymentsPage extends React.Component<PropTypes, StateTypes> {
           {row.amoGift > 0 && ['+', i18n.t('payments_page.table.gift'), ' ', row.amoGift, ' ', row.receivedCurrency, <br key='br' />]}
           {row.amoToPay > 0 && ['+', i18n.t('payments_page.table.debt'), ' ', row.amoToPay, ' ', row.receivedCurrency, <br key='br' />]}
           {row.amoPartner > 0 && ['+', i18n.t('payments_page.table.partner'), ' ', row.amoPartner, ' ', row.receivedCurrency, <br key='br' />]}
+          {(row.amoGift > 0 || row.amoToPay > 0 || row.amoPartner > 0) && ['= ', row.amoTaken, ' ', row.receivedCurrency]}
         </span>
         rows.push(<tr key={row.inTxId}>
           <td>
@@ -329,16 +352,51 @@ class PaymentsPage extends React.Component<PropTypes, StateTypes> {
             {row.sent} {row.sentCurrency}<br />
           </td>
           <td>
-            {row.statusIn === 'pending' && <img alt={i18n.t('payments_page.table.status.pending')} title={i18n.t('payments_page.table.status.pending')} src='/img/payment-pending.png' />}
-            {row.statusIn === 'complete' && <img alt={i18n.t('payments_page.table.status.complete')} title={i18n.t('payments_page.table.status.complete')} src='/img/payment-confirmed.png' />}
+            {
+              row.statusIn === 'pending' &&
+              <img
+                alt={i18n.t('payments_page.table.status.pending')}
+                title={i18n.t('payments_page.table.status.pending')}
+                src='/img/payment-pending.png'
+              />
+            }
+            {
+              row.statusIn === 'complete' &&
+              <img
+                alt={i18n.t('payments_page.table.status.complete')}
+                title={i18n.t('payments_page.table.status.complete')}
+                src='/img/payment-confirmed.png'
+              />
+            }
           </td>
           <td>
             {receivedString}
           </td>
           <td>
-            {row.statusOut === 'pending' && <img alt={i18n.t('payments_page.table.status.pending')} title={i18n.t('payments_page.table.status.pending')} src='/img/payment-pending.png' />}
-            {row.statusOut === 'added' && <img alt={i18n.t('payments_page.table.status.added')} title={i18n.t('payments_page.table.status.added')} src='/img/payment-added.png' />}
-            {row.statusOut === 'complete' && <img alt={i18n.t('payments_page.table.status.complete')} title={i18n.t('payments_page.table.status.complete')} src='/img/payment-confirmed.png' />}
+            {
+              row.statusOut === 'pending' &&
+              <img
+                alt={i18n.t('payments_page.table.status.pending')}
+                title={i18n.t('payments_page.table.status.pending')}
+                src='/img/payment-pending.png'
+              />
+            }
+            {
+              row.statusOut === 'added' &&
+              <img
+                alt={i18n.t('payments_page.table.status.added')}
+                title={i18n.t('payments_page.table.status.added')}
+                src='/img/payment-added.png'
+              />
+            }
+            {
+              row.statusOut === 'complete' &&
+              <img
+                alt={i18n.t('payments_page.table.status.complete')}
+                title={i18n.t('payments_page.table.status.complete')}
+                src='/img/payment-confirmed.png'
+              />
+            }
           </td>
           {this.state.debug && <td>
             {row.rawStatus}<br />
@@ -348,11 +406,19 @@ class PaymentsPage extends React.Component<PropTypes, StateTypes> {
       }
 
       if (messageData.gift_amount > 0) {
-        message = <h3 key='gift_header' className='gift_info'>
-          {i18n.t('payments_page.gift_info_header', {
-            giftAmount: `${messageData.gift_amount}`
-          })}
-        </h3>
+        message = [
+          <h3 key='gift_header' className='gift_info'>
+            {i18n.t('payments_page.gift_info_header', {
+              giftAmount: `${messageData.gift_amount}`,
+              currency: messageData.currency
+            })}
+          </h3>,
+          <p key='gift_text'>{i18n.t('payments_page.gift_info_text', {
+            giftPayed: `${messageData.gift_payed}`,
+            giftPick: `${messageData.gift_pick}`,
+            currency: `${messageData.currency}`
+          })}</p>
+        ]
       }
 
       results = [

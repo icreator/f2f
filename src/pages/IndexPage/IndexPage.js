@@ -134,4 +134,4 @@ class IndexPage extends React.Component<PropTypes, StateTypes> {
   }
 }
 
-export default view(withRouter(IndexPage))
+export default withRouter(view(IndexPage))

@@ -96,9 +96,9 @@ type StateTypes = {
     rawStatusMess: string
   }>,
   messageData: {
-    gift_amount: number,
-    gift_payed: number,
-    gift_pick: number,
+    gift_amount: string,
+    gift_payed: string,
+    gift_pick: string,
     currency: string
   },
   error: ?string,
@@ -120,11 +120,10 @@ type PropTypes = {
 
 const abortableFetch: typeof fetch = ('signal' in new window.Request('')) ? window.fetch : fetch
 const NewAbortController: ?typeof AbortController = ('AbortController' in window) ? window.AbortController : AbortController
-function convert (n: number): number {
+function convert (n: number): string {
   const string = n.toString()
-  console.log(string)
   if (!/e/.exec(string)) {
-    return n
+    return `${n}`
   }
   let lead: string, decimal: string, pow: string
   if (/\./.exec(string)) {
@@ -134,8 +133,8 @@ function convert (n: number): number {
     decimal = ''
   }
   return +pow <= 0
-    ? parseFloat('0.' + '0'.repeat(Math.abs(+pow) - 1) + lead + decimal)
-    : parseFloat(lead + (+pow >= decimal.length ? (decimal + '0'.repeat(+pow - decimal.length)) : (decimal.slice(0, +pow) + '.' + decimal.slice(+pow))))
+    ? '0.' + '0'.repeat(Math.abs(+pow) - 1) + lead + decimal
+    : lead + (+pow >= decimal.length ? (decimal + '0'.repeat(+pow - decimal.length)) : (decimal.slice(0, +pow) + '.' + decimal.slice(+pow)))
 }
 
 class PaymentsPage extends React.Component<PropTypes, StateTypes> {
@@ -145,9 +144,9 @@ class PaymentsPage extends React.Component<PropTypes, StateTypes> {
     focus: false,
     data: [],
     messageData: {
-      gift_amount: 0,
-      gift_payed: 0,
-      gift_pick: 0,
+      gift_amount: '0',
+      gift_payed: '0',
+      gift_pick: '0',
       currency: ''
     },
     error: null,
@@ -163,9 +162,9 @@ class PaymentsPage extends React.Component<PropTypes, StateTypes> {
       error: null,
       loading: true,
       messageData: {
-        gift_amount: 0,
-        gift_payed: 0,
-        gift_pick: 0,
+        gift_amount: '0',
+        gift_payed: '0',
+        gift_pick: '0',
         currency: ''
       }
     })
@@ -405,7 +404,7 @@ class PaymentsPage extends React.Component<PropTypes, StateTypes> {
         </tr>)
       }
 
-      if (messageData.gift_amount > 0) {
+      if (parseFloat(messageData.gift_amount) > 0) {
         message = [
           <h3 key='gift_header' className='gift_info'>
             {i18n.t('payments_page.gift_info_header', {

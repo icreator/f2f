@@ -1,6 +1,11 @@
 {
   "intl": "ru-RU",
   "windowTitle": "Face2Face",
+  "socialNetworks": {
+    "facebookUrl": "https://www.facebook.com/f2fexchange/",
+    "telegramUrl": "https://t.me/F2Fcash",
+    "twitterUrl": "https://twitter.com/Face2face_cash"
+  },
   "logo": {
     "alt": "Логотип Face2Face"
   },
@@ -144,7 +149,15 @@
       "email": "E-mail",
       "message": "Сообщение",
       "send": "Отправить",
-      "success": "Спасибо. Ваше письмо успешно отправлено."
+      "success": "Спасибо. Ваше письмо успешно отправлено.",
+      "errors": {
+        "name_required": "Пожалуйста, заполните имя",
+        "name_length": "Имя должно быть не меньше 2 символов",
+        "email_required": "Пожалуйста, заполните email",
+        "email_invalid": "Введите валидный email",
+        "text_required": "Введите текст сообщения",
+        "text_length": "Текст сообщения должен быть не меньше 10 символов"
+      }
     }
   }
 }

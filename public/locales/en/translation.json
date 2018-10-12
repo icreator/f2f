@@ -1,6 +1,11 @@
 {
   "intl": "en-US",
   "windowTitle": "Face2Face",
+  "socialNetworks": {
+    "facebookUrl": "https://www.facebook.com/f2fexchange/",
+    "telegramUrl": "https://t.me/F2Fcash",
+    "twitterUrl": "https://twitter.com/Face2face_cash"
+  },
   "logo": {
     "alt": "Face2Face Logo"
   },
@@ -144,7 +149,15 @@
       "email": "E-mail",
       "message": "Message",
       "send": "Send message",
-      "success": "Thank you. Your email has been sucessfully sent."
+      "success": "Thank you. Your email has been sucessfully sent.",
+      "errors": {
+        "name_required": "Please fill in your name",
+        "name_length": "Name should be longer than one character",
+        "email_required": "Please fill in your email",
+        "email_invalid": "Please fill in valid email",
+        "text_required": "Please fill in your message",
+        "text_length": "Message text should be longer than 10 characters"
+      }
     }
   }
 }

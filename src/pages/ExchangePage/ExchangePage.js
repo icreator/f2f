@@ -419,7 +419,7 @@ class ExchangePage extends React.Component<PropTypes, StateTypes> {
       </Popup>
       <Lightbox
         open={this.state.lightbox}
-        close={() => this.setState({ lightbox: !this.state.lightbox })}
+        close={() => this.setState({ lightbox: false })}
         content={[
           `/locales/${i18n.lang}/img/era-node-guide.png`,
           `/locales/${i18n.lang}/img/era-mobile-guide.png`
@@ -427,14 +427,14 @@ class ExchangePage extends React.Component<PropTypes, StateTypes> {
       />
       <Popup
         open={this.state.agreementsPopup}
-        close={() => this.setState({ agreementsPopup: !this.state.agreementsPopup })}
+        close={() => this.setState({ agreementsPopup: false })}
       >
         <h1>{i18n.t('exchange.agreementsPopup.header')}</h1>
         <Button onClick={() => this.setState({ agreementsPopup: !this.state.agreementsPopup })}>{i18n.t('ok')}</Button>
       </Popup>
       <Popup
         open={this.state.popup}
-        close={() => this.setState({ popup: !this.state.popup })}
+        close={() => this.setState({ popup: false })}
       >
         <h1>{i18n.t('limitExceededPopup.header', { currency: state.calculator.out.name })}</h1>
         <p>{i18n.t('limitExceededPopup.text1', {
@@ -453,7 +453,7 @@ class ExchangePage extends React.Component<PropTypes, StateTypes> {
       </Popup>
       <Popup
         open={this.state.mayPayPopup}
-        close={() => this.setState({ mayPayPopup: !this.state.mayPayPopup })}
+        close={() => this.setState({ mayPayPopup: false })}
       >
         <h1>{i18n.t('maypayExceededPopup.header', { currency: state.calculator.in.name })}</h1>
         <p>{i18n.t('maypayExceededPopup.text1', {

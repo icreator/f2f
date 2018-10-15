@@ -23,9 +23,9 @@ class Footer extends React.Component<{}> {
           <a href={`/locales/${i18n.lang}/terms_of_use.pdf`}>{i18n.t('footer.termsOfUse')}</a>
         </nav>
         <nav className='footer-social'>
-          <a href={i18n.t('socialNetworks.facebookUrl')} className='facebook'>Facebook</a>
-          <a href={i18n.t('socialNetworks.telegramUrl')} className='telegram'>Telegram</a>
-          <a href={i18n.t('socialNetworks.twitterUrl')} className='twitter'>Twitter</a>
+          <a href={i18n.t('socialNetworks.facebookUrl')} target='_blank' className='facebook'>Facebook</a>
+          <a href={i18n.t('socialNetworks.telegramUrl')} target='_blank' className='telegram'>Telegram</a>
+          <a href={i18n.t('socialNetworks.twitterUrl')} target='_blank' className='twitter'>Twitter</a>
         </nav>
       </div>
     </footer>

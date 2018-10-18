@@ -122,7 +122,8 @@ class ExchangeForm extends React.Component<PropTypes, StateTypes> {
       state.calculator = {
         ...state.calculator,
         amountOut: 0,
-        rate: 0
+        rate: 0,
+        exceeded: false
       }
     }
   };
@@ -168,7 +169,8 @@ class ExchangeForm extends React.Component<PropTypes, StateTypes> {
       state.calculator = {
         ...state.calculator,
         amountOut: 0,
-        rate: 0
+        rate: 0,
+        exceeded: false
       }
     }
   };
@@ -222,7 +224,8 @@ class ExchangeForm extends React.Component<PropTypes, StateTypes> {
       state.calculator = {
         ...state.calculator,
         amountOut: 0,
-        rate: 0
+        rate: 0,
+        exceeded: false
       }
     }
   };

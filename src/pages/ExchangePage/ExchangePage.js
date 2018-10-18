@@ -279,7 +279,7 @@ class ExchangePage extends React.Component<PropTypes, StateTypes> {
       <span className='bold'>{[i18n.t('exchange.rateInfo.rate'), ':']}</span>
       {
         // eslint-disable-next-line eqeqeq
-        ` ${parseFloat(state.calculator.amountIn) == 0 ? 0 : 1} ${state.calculator.in.code} = ${state.calculator.rate} ${state.calculator.out.code}`}
+        ` ${parseFloat(state.calculator.amountIn) == 0 ? 0 : 1} ${state.calculator.in.code} = ${state.calculator.rate.toFixed(8)} ${state.calculator.out.code}`}
       {/* <span className="bold">{` ${i18n.t('exchange.rateInfo.commission')}:`}</span> */}
       {/* {` ${this.state.commission} ${state.calculator.out.code}`} */}
     </span>

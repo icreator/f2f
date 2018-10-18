@@ -329,6 +329,10 @@ class ExchangePage extends React.Component<PropTypes, StateTypes> {
           {` ${availableAmountOut} ${state.calculator.out.code}, `}
           <span className='bold'>{[i18n.t('exchange.rateInfo.debt'), ':']}</span>
           {` ${state.calculator.amountOut - availableAmountOut} ${state.calculator.out.code}`}
+        </span>,
+        <br key='br2' />,
+        <span key='line3'>
+          <span className='bold'>{i18n.t('exchange.rateInfo.debt2')}</span>
         </span>
       ]
       checkboxes.unshift(<div className='row' key='order-agreements'>

@@ -40,6 +40,7 @@ const face2faceState: {
       icon: string,
       name: string,
       name2: string,
+      min?: number,
       bal?: number,
       may_pay?: number
     }},
@@ -49,30 +50,34 @@ const face2faceState: {
       icon: string,
       name: string,
       name2: string,
+      min?: number,
       may_pay?: number,
       bal?: number
     }}
   },
   rates: RatesResponse,
-  calculator: {
+  calculator: {|
     in: {
       id: number,
       name: string,
       icon: string,
-      code: string
+      code: string,
+      min?: number
     },
     out: {
       id: number,
       name: string,
       icon: string,
-      code: string
+      code: string,
+      min?: number
     },
     amountIn: string,
     amountOut: number,
     usdValue: number,
     rate: number,
-    exceeded: boolean
-  }
+    exceeded: boolean,
+    tooLow: boolean
+  |}
 } = store({
   serverName: 'http://face2face.cash',
   loadCurrencies () {
@@ -142,19 +147,22 @@ const face2faceState: {
       id: 0,
       name: '',
       icon: '',
-      code: ''
+      code: '',
+      min: 0
     },
     out: {
       id: 0,
       name: '',
       icon: '',
-      code: ''
+      code: '',
+      min: 0
     },
     amountIn: '',
     amountOut: 0,
     usdValue: 0,
     rate: 0,
-    exceeded: false
+    exceeded: false,
+    tooLow: false
   }
 })
 

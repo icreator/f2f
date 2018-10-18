@@ -161,6 +161,9 @@ class ExchangePage extends React.Component<PropTypes, StateTypes> {
   }
 
   validateCheckboxes = () => {
+    if (state.calculator.tooLowIn || state.calculator.tooLowOut) {
+      return false
+    }
     if (state.calculator.exceeded) {
       return this.state.agreeToOrder && this.state.agreeToLicense
     }

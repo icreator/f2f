@@ -76,7 +76,8 @@ const face2faceState: {
     usdValue: number,
     rate: number,
     exceeded: boolean,
-    tooLow: boolean
+    tooLowIn: boolean,
+    tooLowOut: boolean
   |}
 } = store({
   serverName: 'http://face2face.cash',
@@ -162,7 +163,8 @@ const face2faceState: {
     usdValue: 0,
     rate: 0,
     exceeded: false,
-    tooLow: false
+    tooLowIn: false,
+    tooLowOut: false
   }
 })
 

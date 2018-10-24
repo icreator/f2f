@@ -314,7 +314,13 @@ class PaymentsPage extends React.Component<PropTypes, StateTypes> {
   }
 
   render () {
-    const { search, messageData, data, error, loading } = this.state
+    const {
+      search,
+      // messageData,
+      data,
+      error,
+      loading
+    } = this.state
 
     let results = <span className='not-found' />
 
@@ -334,7 +340,7 @@ class PaymentsPage extends React.Component<PropTypes, StateTypes> {
       results = <span className='not-found'>{i18n.t('payments_page.nothing_found')}</span>
     } else {
       const rows = []
-      let message = ''
+      // let message = ''
       for (let row of data) {
         let receivedString = <span>
           {row.received} {row.receivedCurrency}<br />
@@ -404,7 +410,7 @@ class PaymentsPage extends React.Component<PropTypes, StateTypes> {
         </tr>)
       }
 
-      if (parseFloat(messageData.gift_amount) > 0) {
+      /* if (parseFloat(messageData.gift_amount) > 0) {
         message = [
           <h3 key='gift_header' className='gift_info'>
             {i18n.t('payments_page.gift_info_header', {
@@ -418,10 +424,10 @@ class PaymentsPage extends React.Component<PropTypes, StateTypes> {
             currency: `${messageData.currency}`
           })}</p>
         ]
-      }
+      } */
 
       results = [
-        message,
+        // message,
         <table key='table' className='search-table'>
           <thead>
             <tr>

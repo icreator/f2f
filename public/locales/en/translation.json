@@ -23,7 +23,9 @@
     "exchange": "exchange",
     "receive": "receive",
     "rate": "rate",
-    "btn": "Exchange"
+    "btn": "Exchange",
+    "tooLowInput": "Minimal exchange amount: {min}",
+    "tooLowOut": "Comission exceedes resulting amount"
   },
   "rates": {
     "header": "Exchange Rate"
@@ -54,13 +56,13 @@
     "header": "Exceeded the limit of available funds {currency}",
     "text1": "We apologize for any inconvinience. Now is available {availableAmountOut} {currencyOut}.",
     "text2": "You can place an order and the number of tokens you need will be automatically transferred to your account as the funds appear on the service.",
-    "btn": "Order"
+    "btn": "Continue"
   },
   "maypayExceededPopup": {
     "header": "Exceeded the limit of {currency}",
     "text1": "We apologize for any inconvinience. Service can accept only as much as {mayPay} {currencyIn}.",
     "text2": "You can place an order and the number of tokens you need will be automatically transferred to your account when the amount of {currencyIn} will decrease and there will be enough {currencyOut} tokens.",
-    "btn": "Order"
+    "btn": "Continue"
   },
   "exchange": {
     "header": {

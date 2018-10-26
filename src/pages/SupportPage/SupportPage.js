@@ -41,6 +41,7 @@ class SupportPage extends React.Component<PropTypes, StateTypes> {
     },
     errors: {}
   }
+  shouldValidate: boolean = false
   container: { current: null | HTMLDivElement } = React.createRef()
 
   switchTab = (id: number) => {
@@ -82,6 +83,9 @@ class SupportPage extends React.Component<PropTypes, StateTypes> {
   }
 
   validate = () => {
+    if (!this.shouldValidate) {
+      return false
+    }
     const schema = {
       name: [{
         rule: 'minLength',
@@ -122,6 +126,7 @@ class SupportPage extends React.Component<PropTypes, StateTypes> {
 
   submit = (event: SyntheticEvent<HTMLFormElement>) => {
     event.preventDefault()
+    this.shouldValidate = true
     if (!this.validate()) {
       return
     }
@@ -207,7 +212,7 @@ class SupportPage extends React.Component<PropTypes, StateTypes> {
             </div>
           </div>
           <div className='row row-textarea'>
-            <label>{i18n.t('supportPage.email.message')}</label>
+            <label>{i18n.t('supportPage.email.message')}*</label>
             <textarea onInput={(e: SyntheticEvent<HTMLTextAreaElement>) => {
               this.setState({
                 formData: {

@@ -121,7 +121,7 @@ class ExchangePage extends React.Component<PropTypes, StateTypes> {
     }
     this.abortController = new NewAbortController()
     signal = this.abortController.signal
-    return abortableFetch(`${state.serverName}/api/validate_addr.json/${value}`, {
+    return abortableFetch(`${state.serverName}/api/validate_addr.json/?addr=${value}`, {
       signal
     })
       .then(r => r.json())
@@ -257,7 +257,9 @@ class ExchangePage extends React.Component<PropTypes, StateTypes> {
       wrongWallet: false,
       validWallet: false,
       agreeToOrder: false,
-      agreeToLicense: false
+      agreeToLicense: false,
+      popup: false,
+      mayPayPopup: false
     })
   }
 
@@ -441,7 +443,19 @@ class ExchangePage extends React.Component<PropTypes, StateTypes> {
       </Popup>
       <Popup
         open={this.state.popup}
-        close={() => this.setState({ popup: false })}
+        close={() => {
+          state.calculator = {
+            ...state.calculator,
+            amountIn: '',
+            amountOut: 0,
+            usdValue: 0,
+            rate: 0,
+            exceeded: false,
+            tooLowIn: false,
+            tooLowOut: false
+          }
+          this.resetForm()
+        }}
       >
         <h1>{i18n.t('limitExceededPopup.header', { currency: state.calculator.out.name })}</h1>
         <p>{i18n.t('limitExceededPopup.text1', {
@@ -450,32 +464,53 @@ class ExchangePage extends React.Component<PropTypes, StateTypes> {
           availableAmountIn: (this.state.availableAmountIn ? `${this.state.availableAmountIn}` : '0'),
           availableAmountOut: (this.state.availableAmountOut ? `${this.state.availableAmountOut}` : '0')
         })}</p>
-        <p>{i18n.t('limitExceededPopup.text2')}</p>
         <Button onClick={() => {
-          this.setState({
-            popup: false
-          })
-          this.getInWallet()
+          state.calculator = {
+            ...state.calculator,
+            amountIn: '',
+            amountOut: 0,
+            usdValue: 0,
+            rate: 0,
+            exceeded: false,
+            tooLowIn: false,
+            tooLowOut: false
+          }
+          this.resetForm()
         }}>{i18n.t('continue')}</Button>
       </Popup>
       <Popup
         open={this.state.mayPayPopup}
-        close={() => this.setState({ mayPayPopup: false })}
+        close={() => {
+          state.calculator = {
+            ...state.calculator,
+            amountIn: '',
+            amountOut: 0,
+            usdValue: 0,
+            rate: 0,
+            exceeded: false,
+            tooLowIn: false,
+            tooLowOut: false
+          }
+          this.resetForm()
+        }}
       >
         <h1>{i18n.t('maypayExceededPopup.header', { currency: state.calculator.in.name })}</h1>
         <p>{i18n.t('maypayExceededPopup.text1', {
           currencyIn: state.calculator.in.code,
           mayPay: (this.state.mayPay ? `${this.state.mayPay}` : '0')
         })}</p>
-        <p>{i18n.t('maypayExceededPopup.text2', {
-          currencyIn: state.calculator.in.code,
-          currencyOut: state.calculator.out.code
-        })}</p>
         <Button onClick={() => {
-          this.setState({
-            mayPayPopup: false
-          })
-          this.checkExceeded()
+          state.calculator = {
+            ...state.calculator,
+            amountIn: '',
+            amountOut: 0,
+            usdValue: 0,
+            rate: 0,
+            exceeded: false,
+            tooLowIn: false,
+            tooLowOut: false
+          }
+          this.resetForm()
         }}>{i18n.t('continue')}</Button>
       </Popup>
     </div>

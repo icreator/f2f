@@ -16,7 +16,6 @@ type StateTypes = {|
   rate: string,
   lastInput: string,
   in_loading: boolean,
-  out_loading: boolean,
   out_error: boolean
 |}
 
@@ -28,7 +27,6 @@ class ExchangeForm extends React.Component<PropTypes, StateTypes> {
     rate: '',
     lastInput: 'in',
     in_loading: false,
-    out_loading: false,
     out_error: false
   }
 
@@ -47,9 +45,9 @@ class ExchangeForm extends React.Component<PropTypes, StateTypes> {
   recalculateOutAmount = (currInId, currOutId, amountIn) => {
     this.setState({
       lastInput: 'in',
-      out_loading: true,
       out_error: false
     })
+    state.calculator.out_loading = true
     if (typeof this.props.onChange === 'function') {
       this.props.onChange()
     }
@@ -74,11 +72,9 @@ class ExchangeForm extends React.Component<PropTypes, StateTypes> {
           amountOut: newAmountOut,
           rate,
           exceeded,
-          tooLowOut
-        }
-        this.setState({
+          tooLowOut,
           out_loading: false
-        })
+        }
       }, (e: { name: string }) => {
         if (e.name !== 'AbortError') {
           this.setState({
@@ -116,11 +112,11 @@ class ExchangeForm extends React.Component<PropTypes, StateTypes> {
         this.abortController.abort()
       }
       this.setState({
-        out_loading: false,
         out_error: false
       })
       state.calculator = {
         ...state.calculator,
+        out_loading: false,
         amountOut: 0,
         rate: 0,
         exceeded: false
@@ -163,14 +159,14 @@ class ExchangeForm extends React.Component<PropTypes, StateTypes> {
         this.abortController.abort()
       }
       this.setState({
-        out_loading: false,
         out_error: false
       })
       state.calculator = {
         ...state.calculator,
         amountOut: 0,
         rate: 0,
-        exceeded: false
+        exceeded: false,
+        out_loading: false
       }
     }
   };
@@ -218,14 +214,14 @@ class ExchangeForm extends React.Component<PropTypes, StateTypes> {
         this.abortController.abort()
       }
       this.setState({
-        out_loading: false,
         out_error: false
       })
       state.calculator = {
         ...state.calculator,
         amountOut: 0,
         rate: 0,
-        exceeded: false
+        exceeded: false,
+        out_loading: false
       }
     }
   };
@@ -306,7 +302,7 @@ class ExchangeForm extends React.Component<PropTypes, StateTypes> {
         <CurrencyInput
           value={`${amountOut}`}
           onInput={this.setOutAmount}
-          loading={this.state.out_loading}
+          loading={state.calculator.out_loading}
           error={this.state.out_error}
         />
         <div className='in-usd'>

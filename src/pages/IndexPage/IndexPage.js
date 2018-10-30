@@ -84,7 +84,8 @@ class IndexPage extends React.Component<PropTypes, StateTypes> {
       state.calculator.tooLowOut ||
       parseFloat(state.calculator.amountIn) <= 0 ||
       isNaN(parseFloat(state.calculator.amountIn)) ||
-      state.calculator.exceeded
+      state.calculator.exceeded ||
+      state.calculator.out_loading
 
     return <div className='index-page'>
       <div className='cool-background'>

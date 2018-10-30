@@ -19,7 +19,6 @@ class CurrencyInput extends React.Component<PropTypes, StateTypes> {
     animation: ''
   };
 
-  lastKey = '';
   animationQueue = [];
 
   addAnimation = (className: string, timeout: number) => {
@@ -84,7 +83,6 @@ class CurrencyInput extends React.Component<PropTypes, StateTypes> {
         onChange={() => {}} // Get rid of this pesky react warning in console!
       />
       <div className={`curtain ${this.state.animation}${this.props.error ? ' error' : ''}`} />
-      <span>{this.lastKey}</span>
     </div>
   }
 }

@@ -286,10 +286,10 @@ class ExchangeForm extends React.Component<PropTypes, StateTypes> {
               min: `${state.calculator.in.min}`
             })}</span>
             : [
-              <span>${usdValue.toLocaleString(intl, {
+              <span key='value'>${usdValue.toLocaleString(intl, {
                 minimumFractionDigits: 2
               })}</span>,
-              <span>USD</span>
+              <span key='usd'>USD</span>
             ]
           }
         </div>
@@ -309,10 +309,12 @@ class ExchangeForm extends React.Component<PropTypes, StateTypes> {
         <div className='in-usd'>
           {state.calculator.tooLowOut
             ? <span style={{ color: 'red' }}>{i18n.t('calculator.tooLowOut')}</span>
-            : [
-              <span>{i18n.t('calculator.rate')}</span>,
-              <span>{rate.toFixed(8)}</span>
-            ]
+            : state.calculator.exceeded
+              ? <span style={{ color: 'red' }}>{i18n.t('calculator.exceeded')}</span>
+              : [
+                <span key='string'>{i18n.t('calculator.rate')}</span>,
+                <span key='rate'>{rate.toFixed(8)}</span>
+              ]
           }
         </div>
       </div>

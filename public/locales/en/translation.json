@@ -25,7 +25,8 @@
     "rate": "rate",
     "btn": "Exchange",
     "tooLowInput": "Minimal exchange amount: {min}",
-    "tooLowOut": "Comission exceedes resulting amount"
+    "tooLowOut": "Comission exceedes resulting amount",
+    "exceeded": "Amount exceedes available funds on service accounts"
   },
   "rates": {
     "header": "Exchange Rate"

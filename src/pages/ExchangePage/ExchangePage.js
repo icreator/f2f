@@ -161,12 +161,12 @@ class ExchangePage extends React.Component<PropTypes, StateTypes> {
   }
 
   validateCheckboxes = () => {
-    if (state.calculator.tooLowIn || state.calculator.tooLowOut) {
+    if (state.calculator.tooLowIn || state.calculator.tooLowOut || state.calculator.exceeded) {
       return false
     }
-    if (state.calculator.exceeded) {
-      return this.state.agreeToOrder && this.state.agreeToLicense
-    }
+    // if (state.calculator.exceeded) {
+    //   return this.state.agreeToOrder && this.state.agreeToLicense
+    // }
     return this.state.agreeToLicense
   }
 
@@ -320,7 +320,8 @@ class ExchangePage extends React.Component<PropTypes, StateTypes> {
       </div>
     ]
 
-    if (state.calculator.exceeded) {
+    /** Раскомментируй, чтобы включить страницу обмена */
+    /* if (state.calculator.exceeded) {
       header = i18n.t('exchange.header.order')
       let availableAmountOut = state.getAvailableAmount(state.calculator.out.id)
       if (!availableAmountOut) {
@@ -353,7 +354,7 @@ class ExchangePage extends React.Component<PropTypes, StateTypes> {
           })}
         >{i18n.t('exchange.checkboxes.order')}</label>
       </div>)
-    }
+    } */
 
     const checkboxesValid = this.validateCheckboxes()
 

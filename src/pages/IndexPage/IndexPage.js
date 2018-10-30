@@ -79,9 +79,12 @@ class IndexPage extends React.Component<PropTypes, StateTypes> {
   }
 
   render () {
-    console.log(state.calculator.tooLowIn)
-    console.log(state.calculator.tooLowOut)
-    const exchangeDisabled = state.calculator.tooLowIn || state.calculator.tooLowOut
+    console.log(parseInt(state.calculator.amountIn))
+    const exchangeDisabled = state.calculator.tooLowIn ||
+      state.calculator.tooLowOut ||
+      parseFloat(state.calculator.amountIn) <= 0 ||
+      isNaN(parseFloat(state.calculator.amountIn)) ||
+      state.calculator.exceeded
 
     return <div className='index-page'>
       <div className='cool-background'>

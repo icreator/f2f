@@ -275,6 +275,8 @@ class ExchangeForm extends React.Component<PropTypes, StateTypes> {
       intl = 'en-US'
     }
 
+    const availableAmount = state.getAvailableAmount(state.calculator.out.id)
+
     return <div className='exchange-form'>
       <div className='column'>
         <CurrencySelector value={currIn} onChange={this.setIn} data={state.currencies.in} />
@@ -283,7 +285,8 @@ class ExchangeForm extends React.Component<PropTypes, StateTypes> {
         <div className='in-usd'>
           {(state.calculator.tooLowIn && state.calculator.in.min)
             ? <span style={{ color: 'red' }}>{i18n.t('calculator.tooLowInput', {
-              min: `${state.calculator.in.min}`
+              min: `${state.calculator.in.min}`,
+              curr: state.calculator.in.code
             })}</span>
             : [
               <span key='value'>${usdValue.toLocaleString(intl, {
@@ -310,7 +313,10 @@ class ExchangeForm extends React.Component<PropTypes, StateTypes> {
           {state.calculator.tooLowOut
             ? <span style={{ color: 'red' }}>{i18n.t('calculator.tooLowOut')}</span>
             : state.calculator.exceeded
-              ? <span style={{ color: 'red' }}>{i18n.t('calculator.exceeded')}</span>
+              ? <span style={{ color: 'red' }}>{i18n.t('calculator.exceeded', {
+                amount: availableAmount ? `${availableAmount}` : '0',
+                curr: state.calculator.out.code
+              })}</span>
               : [
                 <span key='string'>{i18n.t('calculator.rate')}</span>,
                 <span key='rate'>{rate.toFixed(8)}</span>

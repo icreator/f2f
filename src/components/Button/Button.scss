@@ -31,4 +31,11 @@
     box-shadow: inset 0 0 24px 12px rgba(255,255,255,0.06),
     0 5px 12px rgba(35,41,48,0.49);
   }
+
+  &:disabled {
+    background: linear-gradient(to bottom, #def2b8, #d0ed9a);
+    box-shadow: none;
+    padding-top: 18px;
+    color: #232930;
+  }
 }

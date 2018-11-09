@@ -1,6 +1,11 @@
 {
   "intl": "en-US",
   "windowTitle": "Face2Face",
+  "socialNetworks": {
+    "facebookUrl": "https://www.facebook.com/f2fexchange/",
+    "telegramUrl": "https://t.me/F2Fcash",
+    "twitterUrl": "https://twitter.com/Face2face_cash"
+  },
   "logo": {
     "alt": "Face2Face Logo"
   },
@@ -18,7 +23,10 @@
     "exchange": "exchange",
     "receive": "receive",
     "rate": "rate",
-    "btn": "Exchange"
+    "btn": "Exchange",
+    "tooLowInput": "Minimal exchange amount: {min} {curr}",
+    "tooLowOut": "Comission exceedes resulting amount",
+    "exceeded": "Amount exceedes available funds on service accounts. Available: {amount} {curr}"
   },
   "rates": {
     "header": "Exchange Rate"
@@ -49,13 +57,13 @@
     "header": "Exceeded the limit of available funds {currency}",
     "text1": "We apologize for any inconvinience. Now is available {availableAmountOut} {currencyOut}.",
     "text2": "You can place an order and the number of tokens you need will be automatically transferred to your account as the funds appear on the service.",
-    "btn": "Order"
+    "btn": "Continue"
   },
   "maypayExceededPopup": {
     "header": "Exceeded the limit of {currency}",
     "text1": "We apologize for any inconvinience. Service can accept only as much as {mayPay} {currencyIn}.",
     "text2": "You can place an order and the number of tokens you need will be automatically transferred to your account when the amount of {currencyIn} will decrease and there will be enough {currencyOut} tokens.",
-    "btn": "Order"
+    "btn": "Continue"
   },
   "exchange": {
     "header": {
@@ -114,9 +122,18 @@
       "rate": "Rate",
       "received": "Received",
       "block_explorer_link": "Block explorer",
-      "show_more": "Show more"
+      "show_more": "Show more",
+      "status": {
+        "pending": "Pending",
+        "added": "Amount is lower than comission, and will be added to next payment",
+        "complete": "Complete"
+      },
+      "gift": "gift",
+      "debt": "from previous payments",
+      "partner": "partner"
     },
-    "gift_info_header": "Congratulations! You have a gift of {giftAmount}₽"
+    "gift_info_header": "Congratulations! You have a gift of {giftAmount} {currency}",
+    "gift_info_text": "You have a chance to get {giftPick} {currency} with next exchange. You have already recieved {giftPayed} {currency}"
   },
   "supportPage": {
     "tabs": [
@@ -135,7 +152,15 @@
       "email": "E-mail",
       "message": "Message",
       "send": "Send message",
-      "success": "Thank you. Your email has been sucessfully sent."
+      "success": "Thank you. Your email has been sucessfully sent.",
+      "errors": {
+        "name_required": "Please fill in your name",
+        "name_length": "Name should be longer than one character",
+        "email_required": "Please fill in your email",
+        "email_invalid": "Please fill in valid email",
+        "text_required": "Please fill in your message",
+        "text_length": "Message text should be longer than 10 characters"
+      }
     }
   }
 }

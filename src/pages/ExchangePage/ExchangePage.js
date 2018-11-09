@@ -121,7 +121,7 @@ class ExchangePage extends React.Component<PropTypes, StateTypes> {
     }
     this.abortController = new NewAbortController()
     signal = this.abortController.signal
-    return abortableFetch(`${state.serverName}/api/validate_addr.json/${value}`, {
+    return abortableFetch(`${state.serverName}/api/validate_addr.json/?addr=${value}`, {
       signal
     })
       .then(r => r.json())
@@ -161,9 +161,12 @@ class ExchangePage extends React.Component<PropTypes, StateTypes> {
   }
 
   validateCheckboxes = () => {
-    if (state.calculator.exceeded) {
-      return this.state.agreeToOrder && this.state.agreeToLicense
+    if (state.calculator.tooLowIn || state.calculator.tooLowOut || state.calculator.exceeded) {
+      return false
     }
+    // if (state.calculator.exceeded) {
+    //   return this.state.agreeToOrder && this.state.agreeToLicense
+    // }
     return this.state.agreeToLicense
   }
 
@@ -254,7 +257,9 @@ class ExchangePage extends React.Component<PropTypes, StateTypes> {
       wrongWallet: false,
       validWallet: false,
       agreeToOrder: false,
-      agreeToLicense: false
+      agreeToLicense: false,
+      popup: false,
+      mayPayPopup: false
     })
   }
 
@@ -276,7 +281,7 @@ class ExchangePage extends React.Component<PropTypes, StateTypes> {
       <span className='bold'>{[i18n.t('exchange.rateInfo.rate'), ':']}</span>
       {
         // eslint-disable-next-line eqeqeq
-        ` ${parseFloat(state.calculator.amountIn) == 0 ? 0 : 1} ${state.calculator.in.code} = ${state.calculator.rate} ${state.calculator.out.code}`}
+        ` ${parseFloat(state.calculator.amountIn) == 0 ? 0 : 1} ${state.calculator.in.code} = ${state.calculator.rate.toFixed(8)} ${state.calculator.out.code}`}
       {/* <span className="bold">{` ${i18n.t('exchange.rateInfo.commission')}:`}</span> */}
       {/* {` ${this.state.commission} ${state.calculator.out.code}`} */}
     </span>
@@ -315,7 +320,8 @@ class ExchangePage extends React.Component<PropTypes, StateTypes> {
       </div>
     ]
 
-    if (state.calculator.exceeded) {
+    /** Раскомментируй, чтобы включить страницу обмена */
+    /* if (state.calculator.exceeded) {
       header = i18n.t('exchange.header.order')
       let availableAmountOut = state.getAvailableAmount(state.calculator.out.id)
       if (!availableAmountOut) {
@@ -329,6 +335,10 @@ class ExchangePage extends React.Component<PropTypes, StateTypes> {
           {` ${availableAmountOut} ${state.calculator.out.code}, `}
           <span className='bold'>{[i18n.t('exchange.rateInfo.debt'), ':']}</span>
           {` ${state.calculator.amountOut - availableAmountOut} ${state.calculator.out.code}`}
+        </span>,
+        <br key='br2' />,
+        <span key='line3'>
+          <span className='bold'>{i18n.t('exchange.rateInfo.debt2')}</span>
         </span>
       ]
       checkboxes.unshift(<div className='row' key='order-agreements'>
@@ -344,7 +354,7 @@ class ExchangePage extends React.Component<PropTypes, StateTypes> {
           })}
         >{i18n.t('exchange.checkboxes.order')}</label>
       </div>)
-    }
+    } */
 
     const checkboxesValid = this.validateCheckboxes()
 
@@ -419,7 +429,7 @@ class ExchangePage extends React.Component<PropTypes, StateTypes> {
       </Popup>
       <Lightbox
         open={this.state.lightbox}
-        close={() => this.setState({ lightbox: !this.state.lightbox })}
+        close={() => this.setState({ lightbox: false })}
         content={[
           `/locales/${i18n.lang}/img/era-node-guide.png`,
           `/locales/${i18n.lang}/img/era-mobile-guide.png`
@@ -427,14 +437,26 @@ class ExchangePage extends React.Component<PropTypes, StateTypes> {
       />
       <Popup
         open={this.state.agreementsPopup}
-        close={() => this.setState({ agreementsPopup: !this.state.agreementsPopup })}
+        close={() => this.setState({ agreementsPopup: false })}
       >
         <h1>{i18n.t('exchange.agreementsPopup.header')}</h1>
         <Button onClick={() => this.setState({ agreementsPopup: !this.state.agreementsPopup })}>{i18n.t('ok')}</Button>
       </Popup>
       <Popup
         open={this.state.popup}
-        close={() => this.setState({ popup: !this.state.popup })}
+        close={() => {
+          state.calculator = {
+            ...state.calculator,
+            amountIn: '',
+            amountOut: 0,
+            usdValue: 0,
+            rate: 0,
+            exceeded: false,
+            tooLowIn: false,
+            tooLowOut: false
+          }
+          this.resetForm()
+        }}
       >
         <h1>{i18n.t('limitExceededPopup.header', { currency: state.calculator.out.name })}</h1>
         <p>{i18n.t('limitExceededPopup.text1', {
@@ -443,32 +465,53 @@ class ExchangePage extends React.Component<PropTypes, StateTypes> {
           availableAmountIn: (this.state.availableAmountIn ? `${this.state.availableAmountIn}` : '0'),
           availableAmountOut: (this.state.availableAmountOut ? `${this.state.availableAmountOut}` : '0')
         })}</p>
-        <p>{i18n.t('limitExceededPopup.text2')}</p>
         <Button onClick={() => {
-          this.setState({
-            popup: false
-          })
-          this.getInWallet()
+          state.calculator = {
+            ...state.calculator,
+            amountIn: '',
+            amountOut: 0,
+            usdValue: 0,
+            rate: 0,
+            exceeded: false,
+            tooLowIn: false,
+            tooLowOut: false
+          }
+          this.resetForm()
         }}>{i18n.t('continue')}</Button>
       </Popup>
       <Popup
         open={this.state.mayPayPopup}
-        close={() => this.setState({ mayPayPopup: !this.state.mayPayPopup })}
+        close={() => {
+          state.calculator = {
+            ...state.calculator,
+            amountIn: '',
+            amountOut: 0,
+            usdValue: 0,
+            rate: 0,
+            exceeded: false,
+            tooLowIn: false,
+            tooLowOut: false
+          }
+          this.resetForm()
+        }}
       >
         <h1>{i18n.t('maypayExceededPopup.header', { currency: state.calculator.in.name })}</h1>
         <p>{i18n.t('maypayExceededPopup.text1', {
           currencyIn: state.calculator.in.code,
           mayPay: (this.state.mayPay ? `${this.state.mayPay}` : '0')
         })}</p>
-        <p>{i18n.t('maypayExceededPopup.text2', {
-          currencyIn: state.calculator.in.code,
-          currencyOut: state.calculator.out.code
-        })}</p>
         <Button onClick={() => {
-          this.setState({
-            mayPayPopup: false
-          })
-          this.checkExceeded()
+          state.calculator = {
+            ...state.calculator,
+            amountIn: '',
+            amountOut: 0,
+            usdValue: 0,
+            rate: 0,
+            exceeded: false,
+            tooLowIn: false,
+            tooLowOut: false
+          }
+          this.resetForm()
         }}>{i18n.t('continue')}</Button>
       </Popup>
     </div>

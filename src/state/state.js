@@ -81,7 +81,7 @@ const face2faceState: {
     out_loading: boolean
   |}
 } = store({
-  serverName: 'http://api.face2face.cash',
+  serverName: '//api.face2face.cash',
   loadCurrencies () {
     return window.fetch(`${face2faceState.serverName}/apipay/get_currs.json`)
       .then((r: { json: () => Promise<{}> }) => r.json())

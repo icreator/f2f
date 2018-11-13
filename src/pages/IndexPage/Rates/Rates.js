@@ -72,7 +72,7 @@ class Rates extends React.Component<PropTypes, StateTypes> {
       const rates = currencies[key]
       items.push(<div key={key}>
         <div>
-          <img alt={key} style={{ width: '32px', height: '32px' }} className='curr-img' src={`http://face2face.cash/${state.icon_url}/${currency.icon}`} />
+          <img alt={key} style={{ width: '32px', height: '32px' }} className='curr-img' src={`http://${state.serverName}/${state.icon_url}/${currency.icon}`} />
           <span className='curr-name'>{currency.name}</span>
         </div>
         <span className='rate-usd'>{rates.rub ? rates.rub.toLocaleString(intl, {

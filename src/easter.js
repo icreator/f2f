@@ -9,7 +9,7 @@ import 'console.image';
 })()
 
 // $FlowFixMe
-window.credits = 'Code by Alexey Ermolaev (http://dotterian.ru)'
+window.credits = 'Code by Alexey Ermolaev (//dotterian.ru)'
 
 // $FlowFixMe
 window.kitty = () => {
@@ -17,9 +17,9 @@ window.kitty = () => {
   const width = Math.ceil(150 + Math.random() * 400)
   const height = Math.ceil(150 + Math.random() * 400)
   const isGrayscale = Math.random() >= 0.5
-  let link = `http://placekitten.com/${width}/${height}`
+  let link = `//placekitten.com/${width}/${height}`
   if (isGrayscale) {
-    link = `http://placekitten.com/g/${width}/${height}`
+    link = `//placekitten.com/g/${width}/${height}`
   }
   // $FlowFixMe
   console.image(link, 1)

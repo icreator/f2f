@@ -42,7 +42,8 @@ const face2faceState: {
       name2: string,
       min?: number,
       bal?: number,
-      may_pay?: number
+      may_pay?: number,
+      system?: string
     }},
     in: {[string]: {
       id: number,
@@ -52,7 +53,8 @@ const face2faceState: {
       name2: string,
       min?: number,
       may_pay?: number,
-      bal?: number
+      bal?: number,
+      system?: string
     }}
   },
   rates: RatesResponse,
@@ -62,26 +64,31 @@ const face2faceState: {
       name: string,
       icon: string,
       code: string,
-      min?: number
+      min?: number,
+      system?: string
     },
     out: {
       id: number,
       name: string,
       icon: string,
       code: string,
-      min?: number
+      min?: number,
+      system?: string
     },
+    lastInput: 'in' | 'out',
     amountIn: string,
-    amountOut: number,
+    amountOut: string,
     usdValue: number,
     rate: number,
     exceeded: boolean,
     tooLowIn: boolean,
     tooLowOut: boolean,
-    out_loading: boolean
+    rateNotFound: boolean,
+    out_loading: boolean,
+    in_loading: boolean
   |}
 } = store({
-  serverName: 'http://api.face2face.cash',
+  serverName: '//api.face2face.cash',
   loadCurrencies () {
     return window.fetch(`${face2faceState.serverName}/apipay/get_currs.json`)
       .then((r: { json: () => Promise<{}> }) => r.json())
@@ -159,14 +166,17 @@ const face2faceState: {
       code: '',
       min: 0
     },
+    lastInput: 'in',
     amountIn: '',
-    amountOut: 0,
+    amountOut: '',
     usdValue: 0,
     rate: 0,
     exceeded: false,
     tooLowIn: false,
     tooLowOut: false,
-    out_loading: false
+    rateNotFound: false,
+    out_loading: false,
+    in_loading: false
   }
 })
 

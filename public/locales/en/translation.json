@@ -26,6 +26,7 @@
     "btn": "Exchange",
     "tooLowInput": "Minimal exchange amount: {min} {curr}",
     "tooLowOut": "Comission exceedes resulting amount",
+    "rateNotFound": "Exchange rate not found for selected currencies",
     "exceeded": "Amount exceedes available funds on service accounts. Available: {amount} {curr}"
   },
   "rates": {
@@ -86,6 +87,7 @@
       "header": "Accounts",
       "out_label": "Enter the account number to receive {currency}",
       "wrong_account": "invalid account number",
+      "null_amont": "Payment amount is too low",
       "next": "Next",
       "in_label": "Transfer {currency} to this account",
       "qr_code": "QR-code",
@@ -94,9 +96,13 @@
     },
     "era_warning": {
       "header": "ATTENTION!",
-      "text": "Copy the number and paste it into the comment box in the Erachain wallet when sending ERA/Compu",
+      "text": "Copy this number and paste it into the comment box in the Erachain wallet when sending ERA/Compu",
       "click_to_copy": "Click to copy this message",
-      "wallet_copied": "Transfer message copied to your clipboard"
+      "wallet_copied": "Transfer message copied to your clipboard",
+      "how_to_header": "NEED SOME HELP?",
+      "how_to_pc": "Computer",
+      "how_to_phone": "Phone",
+      "confirmation": "I've pasted specified number into the comment box in the Erachain wallet"
     },
     "success": {
       "message": [

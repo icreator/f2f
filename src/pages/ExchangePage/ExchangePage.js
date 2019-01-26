@@ -12,22 +12,20 @@ import Lightbox from '../../components/Lightbox/Lightbox'
 import './ExchangePage.scss'
 import { fetch } from 'whatwg-fetch'
 import AbortController from '../../libs/abort-controller'
+import Loader from '../../components/Loader'
 
 type PropTypes = {||}
 type StateTypes = {
   agreeToLicense: boolean,
   agreeToOrder: boolean,
-  headerSize: number,
-  textSize: number,
+  eraConfirm: boolean,
   inWallet: string,
   out_wallet: string,
   wrongWallet: boolean,
   validWallet: boolean,
-  qr: boolean,
   qrUri: string,
   copied: boolean,
   copiedText: string,
-  lightbox: boolean,
   addressLoading: boolean,
   addressInLoading: boolean,
   agreementsPopup: boolean,
@@ -36,7 +34,9 @@ type StateTypes = {
   availableAmountIn?: number,
   availableAmountOut?: number,
   popup: boolean,
-  order: boolean
+  order: boolean,
+  computerPopup: boolean,
+  phonePopup: boolean
 }
 
 const abortableFetch = ('signal' in new window.Request('')) ? window.fetch : fetch
@@ -46,8 +46,7 @@ class ExchangePage extends React.Component<PropTypes, StateTypes> {
   state = {
     agreeToLicense: false,
     agreeToOrder: false,
-    headerSize: 116.25,
-    textSize: 16,
+    eraConfirm: false,
     inWallet: '',
     out_wallet: '',
     wrongWallet: false,
@@ -62,34 +61,13 @@ class ExchangePage extends React.Component<PropTypes, StateTypes> {
     agreementsPopup: false,
     mayPayPopup: false,
     popup: false,
-    order: false
+    order: false,
+    computerPopup: false,
+    phonePopup: false
   };
   container: { current: null | HTMLDivElement } = React.createRef();
 
   abortController: typeof NewAbortController
-
-  componentDidMount () {
-    this.resizeText()
-    window.addEventListener('resize', this.resizeText)
-  }
-
-  componentWillUnmount () {
-    window.removeEventListener('resize', this.resizeText)
-  }
-
-  resizeText = () => {
-    if (!this.container.current) {
-      return
-    }
-    const percentage = this.container.current.offsetHeight / 471
-    const headerSize = 116.25 * percentage
-    const textSize = 16 * percentage
-
-    this.setState({
-      headerSize,
-      textSize
-    })
-  };
 
   onInput = (e: SyntheticEvent<HTMLInputElement>) => {
     const value = e.currentTarget.value
@@ -161,7 +139,7 @@ class ExchangePage extends React.Component<PropTypes, StateTypes> {
   }
 
   validateCheckboxes = () => {
-    if (state.calculator.tooLowIn || state.calculator.tooLowOut || state.calculator.exceeded) {
+    if (state.calculator.tooLowIn || state.calculator.tooLowOut || state.calculator.exceeded || state.calculator.rateNotFound) {
       return false
     }
     // if (state.calculator.exceeded) {
@@ -197,11 +175,12 @@ class ExchangePage extends React.Component<PropTypes, StateTypes> {
 
   checkExceeded = () => {
     const { amountOut, out: currOut } = state.calculator
+    const amountOutNum = parseFloat(amountOut)
     let availableAmountOut = state.getAvailableAmount(currOut.id)
     if (!availableAmountOut) {
       availableAmountOut = 0
     }
-    if (amountOut > availableAmountOut) {
+    if (amountOutNum > availableAmountOut) {
       this.setState({
         popup: true,
         availableAmountOut
@@ -258,35 +237,28 @@ class ExchangePage extends React.Component<PropTypes, StateTypes> {
       validWallet: false,
       agreeToOrder: false,
       agreeToLicense: false,
+      eraConfirm: false,
       popup: false,
       mayPayPopup: false
     })
   }
 
   render () {
-    const style = <style>
-      {`
-      .accounts-box .section-name {
-        font-size: ${this.state.headerSize}px;
-      }
-      .accounts-box .accounts-fg,
-      .accounts-box .accounts-fg input,
-      .accounts-box .accounts-fg button {
-        font-size: ${this.state.textSize}px;
-      }
-      `}
-    </style>
     let header = i18n.t('exchange.header.exchange')
+    let { rate } = state.calculator
+    if (!rate) {
+      rate = 0
+    }
     let rateInfo = <span key='line1'>
       <span className='bold'>{[i18n.t('exchange.rateInfo.rate'), ':']}</span>
       {
         // eslint-disable-next-line eqeqeq
-        ` ${parseFloat(state.calculator.amountIn) == 0 ? 0 : 1} ${state.calculator.in.code} = ${state.calculator.rate.toFixed(8)} ${state.calculator.out.code}`}
+        ` ${parseFloat(state.calculator.amountIn) == 0 ? 0 : 1} ${state.calculator.in.code} = ${rate.toFixed(8)} ${state.calculator.out.code}`}
       {/* <span className="bold">{` ${i18n.t('exchange.rateInfo.commission')}:`}</span> */}
       {/* {` ${this.state.commission} ${state.calculator.out.code}`} */}
     </span>
     const checkboxes = [
-      <div className='row' key='license-agreements'>
+      <div className='checkbox-row' key='license-agreements'>
         <div
           className={'checkbox' + (this.state.agreeToLicense ? ' active' : '')}
           onClick={() => this.setState({
@@ -357,9 +329,10 @@ class ExchangePage extends React.Component<PropTypes, StateTypes> {
     } */
 
     const checkboxesValid = this.validateCheckboxes()
+    const isErachain = state.calculator.in.system && ['erachain'].includes(state.calculator.in.system)
+    let stepNumber = 0
 
     return <div className='exchange-page'>
-      {style}
       <div className='container-950'>
         <h1>{header}</h1>
         <ExchangeForm onChange={this.resetForm} />
@@ -369,57 +342,102 @@ class ExchangePage extends React.Component<PropTypes, StateTypes> {
         <div className='acceptance-checkboxes'>
           {checkboxes}
         </div>
-      </div>
-      <div className='accounts-box' ref={this.container}>
-        <h2 className='section-name'>{i18n.t('exchange.accounts.header')}</h2>
-        <div className='accounts-fg'>
-          {checkboxesValid && <span className='account-out-label'>{i18n.t('exchange.accounts.out_label', { currency: state.calculator.out.code })}</span>}
-          {<input className={`account-out-input`} disabled={!checkboxesValid} onChange={() => {}} value={this.state.out_wallet} onInput={this.onInput} />}
-          {this.state.wrongWallet && <span className='account-out-error'>{i18n.t('exchange.accounts.wrong_account')}</span>}
-          {this.state.addressLoading && <div className='next-btn'><div className='address-loader' /></div>}
-          {(this.state.validWallet && state.calculator.amountOut > 0) && <button className='next-btn' onClick={this.validateAll}>{i18n.t('exchange.accounts.next')}</button>}
-          {this.state.inWallet !== '' && <span className='account-in-label'>{i18n.t('exchange.accounts.in_label', { currency: state.calculator.in.code })}</span>}
-          <input title={i18n.t('exchange.accounts.click_to_copy')} className='account-in-input' readOnly onClick={(e: SyntheticEvent<HTMLInputElement>) => this.copyToClipboard(e, 'exchange.accounts.wallet_copied')} value={this.state.inWallet} />
-          {(this.state.inWallet !== '' && this.state.qrUri !== '') && <button className='qr-code-btn' onClick={() => this.setState({
-            qr: true
-          })}>{i18n.t('exchange.accounts.qr_code')}</button>}
-          {this.state.addressInLoading && <div className='qr-code-btn'><div className='address-loader' /></div>}
-        </div>
-      </div>
-      {(this.state.inWallet && ['ERA', 'COMPU'].includes(state.calculator.in.code)) && <div className='era-warning'>
-        <div className='container-950'>
-          <h1>{i18n.t('exchange.era_warning.header')}</h1>
-          <div className='right-part'>
-            <span>{i18n.t('exchange.era_warning.text')}</span>
+        {/* Ввод номера счёта для получения валюты */}
+        {checkboxesValid && <div className='exchange-section'>
+          <span className='step-number'>{++stepNumber}</span>
+          <div>
+            <h3>{i18n.t('exchange.accounts.out_label', {
+              currency: state.calculator.out.code
+            })}</h3>
             <div>
-              <input title={i18n.t('exchange.era_warning.click_to_copy')} value={`${state.calculator.out.code}:${this.state.out_wallet}`} readOnly onClick={(e: SyntheticEvent<HTMLInputElement>) => this.copyToClipboard(e, 'exchange.era_warning.wallet_copied')} />
-              <button className='question-mark-btn' onClick={() => this.setState({ lightbox: true })} />
+              <input className={`account-out-input ${(this.state.wrongWallet) ? 'error' : ''}`} onChange={() => { }} value={this.state.out_wallet} onInput={this.onInput} />
+            </div>
+            {this.state.wrongWallet && <span className='account-out-error'>{i18n.t('exchange.accounts.wrong_account')}</span>}
+            {(parseFloat(state.calculator.amountOut) === 0 || isNaN(parseFloat(state.calculator.amountOut))) && <span className='account-out-error'>{i18n.t('exchange.accounts.null_amount')}</span>}
+            {this.state.validWallet && parseFloat(state.calculator.amountOut) > 0 && !this.state.addressInLoading && this.state.inWallet === '' && <div className='nextButton'><button className='btn' onClick={this.validateAll}>{i18n.t('exchange.accounts.next')}</button></div>}
+            {(this.state.addressInLoading || this.state.addressLoading) && <div className='nextButton'><Loader /></div>}
+          </div>
+        </div>}
+        {/* Предупреждение ERACHAIN */}
+        {isErachain && this.state.inWallet !== '' && <div className='exchange-section'>
+          <span className='step-number'>{++stepNumber}</span>
+          <div className='era-warning'>
+            <div className='erachain-warning-left'>
+              <h3>{i18n.t('exchange.era_warning.header')}</h3>
+              <p>
+                {i18n.t('exchange.era_warning.text', {
+                  currency: state.calculator.out.code,
+                  // $FlowFixMe
+                  br: <br />
+                })}
+              </p>
+            </div>
+            <div className='erachain-warning-right'>
+              <h3>{i18n.t('exchange.era_warning.how_to_header')}</h3>
+              <div className='row'>
+                <div className='erachain-warning-how-to-item-container'>
+                  <div onClick={() => this.setState({
+                    computerPopup: true
+                  })}>
+                    <img src='/img/desktop-solid.svg' />
+                    <span>{i18n.t('exchange.era_warning.how_to_pc')}</span>
+                  </div>
+                </div>
+                <div className='erachain-warning-how-to-item-container'>
+                  <div onClick={() => this.setState({
+                    phonePopup: true
+                  })}>
+                    <img src='/img/mobile-alt-solid.svg' />
+                    <span>{i18n.t('exchange.era_warning.how_to_phone')}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className='checkbox-row'>
+              <div
+                className={'checkbox' + (this.state.eraConfirm ? ' active' : '')}
+                onClick={() => this.setState({
+                  eraConfirm: !this.state.eraConfirm
+                })}
+              />
+              <label
+                onClick={() => this.setState({
+                  eraConfirm: !this.state.eraConfirm
+                })}
+              >{i18n.t('exchange.era_warning.confirmation')}</label>
             </div>
           </div>
-        </div>
-      </div>}
-      {this.state.inWallet && <div className='container-950 ta-center'>
-        <p>
-          {[
-            this.state.order && <span>{i18n.t('exchange.success.message[0]')}<br /></span>,
-            i18n.t('exchange.success.message[1]')
-          ]}
-        </p>
-        <hr className='short-hr' />
-        <p>
-          {i18n.t('exchange.success.message[2]')}
-        </p>
-        <Link to={`/payments/${state.calculator.out.code}/${this.state.out_wallet}`} className='btn'>{i18n.t('exchange.success.payments_button')}</Link>
-      </div>}
-      <Popup
-        open={this.state.qr}
-        close={() => this.setState({ qr: !this.state.qr })}
-      >
-        <QRCode
-          logo={`${state.serverName}${state.icon_url}/${state.calculator.in.icon}`}
-          value={`${this.state.qrUri}`}
-        />
-      </Popup>
+        </div>}
+        {/* Кошелёк длдя перевода, QR-код и прочие радости жизни */}
+        {this.state.inWallet !== '' && (!isErachain || this.state.eraConfirm) && <div className='exchange-section'>
+          <span className='step-number'>{++stepNumber}</span>
+          <div>
+            <h3>{i18n.t('exchange.accounts.in_label', {
+              currency: state.calculator.in.code
+            })}</h3>
+            <input title={i18n.t('exchange.accounts.click_to_copy')} className='account-in-input' readOnly onClick={(e: SyntheticEvent<HTMLInputElement>) => this.copyToClipboard(e, 'exchange.accounts.wallet_copied')} value={this.state.inWallet} />
+            <div className='QR-code'>
+              <QRCode
+                logo={`${state.serverName}${state.icon_url}/${state.calculator.in.icon}`}
+                value={`${this.state.qrUri}`}
+              />
+            </div>
+            <div className='ta-center'>
+              <p>
+                {[
+                  this.state.order && <span>{i18n.t('exchange.success.message[0]')}<br /></span>,
+                  i18n.t('exchange.success.message[1]')
+                ]}
+              </p>
+              <hr className='short-hr' />
+              <p>
+                {i18n.t('exchange.success.message[2]')}
+              </p>
+              <Link to={`/payments/${state.calculator.out.code}/${this.state.out_wallet}`} className='btn'>{i18n.t('exchange.success.payments_button')}</Link>
+            </div>
+          </div>
+        </div>}
+      </div>
       <Popup
         open={this.state.copied}
         close={() => this.setState({ copied: !this.state.copied })}
@@ -428,10 +446,16 @@ class ExchangePage extends React.Component<PropTypes, StateTypes> {
         <Button onClick={() => this.setState({ copied: !this.state.copied })}>{i18n.t('ok')}</Button>
       </Popup>
       <Lightbox
-        open={this.state.lightbox}
-        close={() => this.setState({ lightbox: false })}
+        open={this.state.computerPopup}
+        close={() => this.setState({ computerPopup: false })}
         content={[
-          `/locales/${i18n.lang}/img/era-node-guide.png`,
+          `/locales/${i18n.lang}/img/era-node-guide.png`
+        ]}
+      />
+      <Lightbox
+        open={this.state.phonePopup}
+        close={() => this.setState({ phonePopup: false })}
+        content={[
           `/locales/${i18n.lang}/img/era-mobile-guide.png`
         ]}
       />
@@ -447,8 +471,8 @@ class ExchangePage extends React.Component<PropTypes, StateTypes> {
         close={() => {
           state.calculator = {
             ...state.calculator,
-            amountIn: '',
-            amountOut: 0,
+            amountIn: '0',
+            amountOut: '0',
             usdValue: 0,
             rate: 0,
             exceeded: false,
@@ -468,8 +492,8 @@ class ExchangePage extends React.Component<PropTypes, StateTypes> {
         <Button onClick={() => {
           state.calculator = {
             ...state.calculator,
-            amountIn: '',
-            amountOut: 0,
+            amountIn: '0',
+            amountOut: '0',
             usdValue: 0,
             rate: 0,
             exceeded: false,
@@ -484,8 +508,8 @@ class ExchangePage extends React.Component<PropTypes, StateTypes> {
         close={() => {
           state.calculator = {
             ...state.calculator,
-            amountIn: '',
-            amountOut: 0,
+            amountIn: '0',
+            amountOut: '0',
             usdValue: 0,
             rate: 0,
             exceeded: false,
@@ -503,8 +527,8 @@ class ExchangePage extends React.Component<PropTypes, StateTypes> {
         <Button onClick={() => {
           state.calculator = {
             ...state.calculator,
-            amountIn: '',
-            amountOut: 0,
+            amountIn: '0',
+            amountOut: '0',
             usdValue: 0,
             rate: 0,
             exceeded: false,

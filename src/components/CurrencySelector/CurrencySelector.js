@@ -10,14 +10,16 @@ type PropTypes = {
     id: number,
     name: string,
     icon: string,
-    code: string
+    code: string,
+    system?: string
   },
   onChange: ({
     id: number,
     name: string,
     icon: string,
     code: string,
-    min?: number
+    min?: number,
+    system?: string
   }) => void,
   data: { [string]: {
     id: number,
@@ -27,7 +29,8 @@ type PropTypes = {
     name2: string,
     min?: number,
     may_pay?: number,
-    bal?: number
+    bal?: number,
+    system?: string
   }}
 }
 type StateTypes = {
@@ -68,7 +71,8 @@ class CurrencySelector extends React.Component<PropTypes, StateTypes> {
     name: string,
     icon: string,
     code: string,
-    min?: number
+    min?: number,
+    system?: string
   }) => {
     this.setState({
       dropdown: false

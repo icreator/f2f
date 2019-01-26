@@ -182,7 +182,7 @@ class SupportPage extends React.Component<PropTypes, StateTypes> {
           {tabText}
         </div>
       </div>
-      <div className='email-container' ref={this.container}>
+      {/* <div className='email-container' ref={this.container}>
         <h1 className='section-name'>{i18n.t('supportPage.email.header')}</h1>
         <form className='email-inner-container' onSubmit={this.submit}>
           <div className='row'>
@@ -227,7 +227,7 @@ class SupportPage extends React.Component<PropTypes, StateTypes> {
             <button type='submit' className='btn'>{i18n.t('supportPage.email.send')}</button>
           </div>
         </form>
-      </div>
+      </div> */}
       <Popup
         open={this.state.popup}
         close={() => this.setState({ popup: !this.state.popup })}

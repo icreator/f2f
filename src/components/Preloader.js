@@ -137,10 +137,6 @@ class Preloader extends React.Component<PropTypes, StateTypes> {
     },
     exchange: {
       images: [
-        'accounts-bg.png',
-        'accounts-fg.png',
-        'attention.png',
-        'question-mark.png'
       ]
     },
     payments: {

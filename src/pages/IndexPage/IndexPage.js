@@ -37,11 +37,12 @@ class IndexPage extends React.Component<PropTypes, StateTypes> {
 
   exchange = () => {
     const { amountOut, out: currOut } = state.calculator
+    const amountOutNum = parseFloat(amountOut)
     let availableAmountOut = state.getAvailableAmount(currOut.id)
     if (!availableAmountOut) {
       availableAmountOut = 0
     }
-    if (amountOut > availableAmountOut) {
+    if (amountOutNum > availableAmountOut) {
       this.setState({
         popup: true,
         availableAmountOut
@@ -82,6 +83,7 @@ class IndexPage extends React.Component<PropTypes, StateTypes> {
     console.log(parseInt(state.calculator.amountIn))
     const exchangeDisabled = state.calculator.tooLowIn ||
       state.calculator.tooLowOut ||
+      state.calculator.rateNotFound ||
       parseFloat(state.calculator.amountIn) <= 0 ||
       isNaN(parseFloat(state.calculator.amountIn)) ||
       state.calculator.exceeded ||
@@ -108,8 +110,8 @@ class IndexPage extends React.Component<PropTypes, StateTypes> {
         close={() => {
           state.calculator = {
             ...state.calculator,
-            amountIn: '',
-            amountOut: 0,
+            amountIn: '0',
+            amountOut: '0',
             usdValue: 0,
             rate: 0,
             exceeded: false,
@@ -131,8 +133,8 @@ class IndexPage extends React.Component<PropTypes, StateTypes> {
         <Button onClick={() => {
           state.calculator = {
             ...state.calculator,
-            amountIn: '',
-            amountOut: 0,
+            amountIn: '0',
+            amountOut: '0',
             usdValue: 0,
             rate: 0,
             exceeded: false,
@@ -149,8 +151,8 @@ class IndexPage extends React.Component<PropTypes, StateTypes> {
         close={() => {
           state.calculator = {
             ...state.calculator,
-            amountIn: '',
-            amountOut: 0,
+            amountIn: '0',
+            amountOut: '0',
             usdValue: 0,
             rate: 0,
             exceeded: false,
@@ -170,8 +172,8 @@ class IndexPage extends React.Component<PropTypes, StateTypes> {
         <Button onClick={() => {
           state.calculator = {
             ...state.calculator,
-            amountIn: '',
-            amountOut: 0,
+            amountIn: '0',
+            amountOut: '0',
             usdValue: 0,
             rate: 0,
             exceeded: false,

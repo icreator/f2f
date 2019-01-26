@@ -14,9 +14,8 @@ type PropTypes = {|
 |}
 type StateTypes = {|
   rate: string,
-  lastInput: string,
-  in_loading: boolean,
-  out_error: boolean
+  out_error: boolean,
+  in_error: boolean
 |}
 
 const abortableFetch = ('signal' in new window.Request('')) ? window.fetch : fetch
@@ -25,9 +24,8 @@ const NewAbortController = ('AbortController' in window) ? window.AbortControlle
 class ExchangeForm extends React.Component<PropTypes, StateTypes> {
   state = {
     rate: '',
-    lastInput: 'in',
-    in_loading: false,
-    out_error: false
+    out_error: false,
+    in_error: false
   }
 
   abortController: typeof abortableFetch
@@ -43,8 +41,8 @@ class ExchangeForm extends React.Component<PropTypes, StateTypes> {
   }
 
   recalculateOutAmount = (currInId, currOutId, amountIn) => {
+    state.calculator.lastInput = 'in'
     this.setState({
-      lastInput: 'in',
       out_error: false
     })
     state.calculator.out_loading = true
@@ -52,10 +50,12 @@ class ExchangeForm extends React.Component<PropTypes, StateTypes> {
       this.props.onChange()
     }
     let availableAmountOut = state.getAvailableAmount(currOutId)
-    this.loadRate(currInId, currOutId, amountIn)
+    const amountInNum = parseFloat(amountIn)
+    this.loadRate(currInId, currOutId, amountInNum)
       .then(({ volume_out: amountOut, rate }) => {
         let exceeded = false
         let tooLowOut = false
+        let rateNotFound = false
         if (!availableAmountOut) {
           availableAmountOut = 0
         }
@@ -67,12 +67,17 @@ class ExchangeForm extends React.Component<PropTypes, StateTypes> {
           newAmountOut = 0.0
           tooLowOut = true
         }
+        if (!amountOut) {
+          newAmountOut = 0.0
+          rateNotFound = true
+        }
         state.calculator = {
           ...state.calculator,
-          amountOut: newAmountOut,
+          amountOut: `${newAmountOut}`,
           rate,
           exceeded,
           tooLowOut,
+          rateNotFound,
           out_loading: false
         }
       }, (e: { name: string }) => {
@@ -84,6 +89,41 @@ class ExchangeForm extends React.Component<PropTypes, StateTypes> {
         }
       })
   };
+
+  recalculateInAmount = (currInId, currOutId, amountOut) => {
+    state.calculator.lastInput = 'out'
+    this.setState({
+      in_error: false
+    })
+    state.calculator.in_loading = true
+    if (typeof this.props.onChange === 'function') {
+      this.props.onChange()
+    }
+    this.loadRate(currInId, currOutId, amountOut, true)
+      .then(({ volume_out: amountIn, rate }) => {
+        let tooLowIn = false
+        let newAmountIn = amountIn
+        if (state.calculator.in.min) {
+          if (amountIn < state.calculator.in.min) {
+            tooLowIn = true
+          }
+        }
+        state.calculator = {
+          ...state.calculator,
+          amountIn: `${newAmountIn}`,
+          rate,
+          tooLowIn,
+          in_loading: false
+        }
+      }, (e: { name: string }) => {
+        if (e.name !== 'AbortError') {
+          this.setState({
+            in_error: true
+          })
+          console.log(e)
+        }
+      })
+  }
 
   setInAmount = (event: SyntheticEvent<HTMLInputElement>) => {
     const amountIn = event.currentTarget.value
@@ -117,14 +157,59 @@ class ExchangeForm extends React.Component<PropTypes, StateTypes> {
       state.calculator = {
         ...state.calculator,
         out_loading: false,
-        amountOut: 0,
+        amountOut: '0',
         rate: 0,
         exceeded: false
       }
     }
   };
 
-  setOutAmount = (event) => {
+  setOutAmount = (event: SyntheticEvent<HTMLInputElement>) => {
+    const amountOut = event.currentTarget.value
+    let tooLowOut = false
+    let exceeded = false
+    const { in: currIn, out: currOut } = state.calculator
+    let amountOutNum = parseFloat(amountOut)
+    if (isNaN(amountOutNum)) {
+      amountOutNum = 0
+    }
+    if (state.calculator.out.min) {
+      if (amountOutNum < state.calculator.out.min) {
+        amountOutNum = 0
+        tooLowOut = true
+      }
+    }
+    let availableAmount = state.getAvailableAmount(currOut.id)
+    if (!availableAmount) {
+      availableAmount = 0
+    }
+    if (amountOutNum > availableAmount) {
+      exceeded = true
+    }
+    state.calculator = {
+      ...state.calculator,
+      amountOut: amountOut,
+      usdValue: amountOutNum * state.getRate('usd', currOut.code),
+      exceeded,
+      tooLowOut
+    }
+    if (!tooLowOut) {
+      this.recalculateInAmount(currIn.id, currOut.id, amountOutNum)
+    } else {
+      if (this.abortController !== undefined) {
+        this.abortController.abort()
+      }
+      this.setState({
+        in_error: false
+      })
+      state.calculator = {
+        ...state.calculator,
+        in_loading: false,
+        amountIn: '0',
+        rate: 0,
+        exceeded: false
+      }
+    }
   };
 
   setIn = (currIn: {
@@ -132,42 +217,56 @@ class ExchangeForm extends React.Component<PropTypes, StateTypes> {
     name: string,
     code: string,
     icon: string,
-    min?: number
+    min?: number,
+    system?: string
   }) => {
-    const { out, amountIn } = state.calculator
-    let amountInNum = parseFloat(amountIn)
-    let tooLowIn = false
-    if (isNaN(amountInNum)) {
-      amountInNum = 0
-    }
-    if (currIn.min) {
-      if (amountInNum < currIn.min) {
+    if (state.calculator.lastInput === 'in') {
+      const { out, amountIn } = state.calculator
+      let amountInNum = parseFloat(amountIn)
+      let tooLowIn = false
+      if (isNaN(amountInNum)) {
         amountInNum = 0
-        tooLowIn = true
       }
-    }
-    state.calculator = {
-      ...state.calculator,
-      in: currIn,
-      usdValue: amountInNum * state.getRate('usd', currIn.code),
-      tooLowIn
-    }
-    if (!tooLowIn) {
-      this.recalculateOutAmount(currIn.id, out.id, amountInNum)
-    } else {
-      if (this.abortController !== undefined) {
-        this.abortController.abort()
+      if (currIn.min) {
+        if (amountInNum < currIn.min) {
+          amountInNum = 0
+          tooLowIn = true
+        }
       }
-      this.setState({
-        out_error: false
-      })
       state.calculator = {
         ...state.calculator,
-        amountOut: 0,
-        rate: 0,
-        exceeded: false,
-        out_loading: false
+        in: currIn,
+        usdValue: amountInNum * state.getRate('usd', currIn.code),
+        tooLowIn
       }
+      if (!tooLowIn) {
+        this.recalculateOutAmount(currIn.id, out.id, amountInNum)
+      } else {
+        if (this.abortController !== undefined) {
+          this.abortController.abort()
+        }
+        this.setState({
+          out_error: false
+        })
+        state.calculator = {
+          ...state.calculator,
+          amountOut: '0',
+          rate: 0,
+          exceeded: false,
+          out_loading: false
+        }
+      }
+    } else {
+      const { out, amountOut } = state.calculator
+      let amountOutNum = parseFloat(amountOut)
+      if (isNaN(amountOutNum)) {
+        amountOutNum = 0
+      }
+      state.calculator = {
+        ...state.calculator,
+        in: currIn
+      }
+      this.recalculateInAmount(currIn.id, out.id, amountOutNum)
     }
   };
 
@@ -176,25 +275,71 @@ class ExchangeForm extends React.Component<PropTypes, StateTypes> {
     name: string,
     icon: string,
     code: string,
-    min?: number
+    min?: number,
+    system?: string
   }) => {
-    const { in: currIn, amountIn } = state.calculator
-    let amountInNum = parseFloat(amountIn)
-    if (isNaN(amountInNum)) {
-      amountInNum = 0
+    if (state.calculator.lastInput === 'in') {
+      const { in: currIn, amountIn } = state.calculator
+      let amountInNum = parseFloat(amountIn)
+      if (isNaN(amountInNum)) {
+        amountInNum = 0
+      }
+      state.calculator = {
+        ...state.calculator,
+        out
+      }
+      this.recalculateOutAmount(currIn.id, out.id, amountInNum)
+    } else {
+      const { in: currIn, amountOut } = state.calculator
+      let amountOutNum = parseFloat(amountOut)
+      let exceeded = false
+      let tooLowOut = false
+      if (isNaN(amountOutNum)) {
+        amountOutNum = 0
+      }
+      let availableAmountOut = state.getAvailableAmount(out.id)
+      if (!availableAmountOut) {
+        availableAmountOut = 0
+      }
+      if (amountOutNum > availableAmountOut) {
+        exceeded = true
+      }
+      if (amountOutNum < 0) {
+        tooLowOut = true
+      }
+      state.calculator = {
+        ...state.calculator,
+        out,
+        exceeded,
+        tooLowOut
+      }
+      if (!tooLowOut) {
+        this.recalculateInAmount(currIn.id, out.id, amountOutNum)
+      } else {
+        if (this.abortController !== undefined) {
+          this.abortController.abort()
+        }
+        this.setState({
+          in_error: false
+        })
+        state.calculator = {
+          ...state.calculator,
+          amountIn: '0',
+          rate: 0,
+          exceeded: false,
+          tooLowIn: false,
+          in_loading: false
+        }
+      }
     }
-    state.calculator = {
-      ...state.calculator,
-      out
-    }
-    this.recalculateOutAmount(currIn.id, out.id, amountInNum)
   };
 
   swap = () => {
     const { in: out, out: currIn, amountOut: amountIn } = state.calculator
+    const amountInNum = parseFloat(amountIn)
     let tooLowIn = false
     if (currIn.min) {
-      if (amountIn < currIn.min) {
+      if (amountInNum < currIn.min) {
         tooLowIn = false
       }
     }
@@ -203,7 +348,7 @@ class ExchangeForm extends React.Component<PropTypes, StateTypes> {
       in: currIn,
       out,
       amountIn: `${amountIn}`,
-      usdValue: amountIn * state.getRate('usd', currIn.code),
+      usdValue: amountInNum * state.getRate('usd', currIn.code),
       tooLowIn,
       tooLowOut: false
     }
@@ -218,7 +363,7 @@ class ExchangeForm extends React.Component<PropTypes, StateTypes> {
       })
       state.calculator = {
         ...state.calculator,
-        amountOut: 0,
+        amountOut: '0',
         rate: 0,
         exceeded: false,
         out_loading: false
@@ -226,7 +371,7 @@ class ExchangeForm extends React.Component<PropTypes, StateTypes> {
     }
   };
 
-  loadRate: (currIn: number, currOut: number, amount: number) => Promise<{
+  loadRate: (currIn: number, currOut: number, amount: number, calcOut?: boolean) => Promise<{
     volume_out: number,
     rate: number
   }> = (currIn, currOut, amount) => {
@@ -261,9 +406,15 @@ class ExchangeForm extends React.Component<PropTypes, StateTypes> {
       amountOut,
       in: currIn,
       out: currOut,
-      usdValue,
+      usdValue
+    } = state.calculator
+    let {
       rate
     } = state.calculator
+
+    if (!rate) {
+      rate = 0
+    }
 
     let intl = i18n.t('intl')
 
@@ -277,7 +428,12 @@ class ExchangeForm extends React.Component<PropTypes, StateTypes> {
       <div className='column'>
         <CurrencySelector value={currIn} onChange={this.setIn} data={state.currencies.in} />
         <label>{i18n.t('calculator.exchange')}</label>
-        <CurrencyInput value={amountIn} onInput={this.setInAmount} loading={this.state.in_loading} error={false} />
+        <CurrencyInput
+          value={amountIn}
+          onInput={this.setInAmount}
+          loading={state.calculator.in_loading}
+          error={this.state.in_error}
+        />
         <div className='in-usd'>
           {(state.calculator.tooLowIn && state.calculator.in.min)
             ? <span style={{ color: 'red' }}>{i18n.t('calculator.tooLowInput', {
@@ -301,7 +457,8 @@ class ExchangeForm extends React.Component<PropTypes, StateTypes> {
         <label>{i18n.t('calculator.receive')}</label>
         <CurrencyInput
           value={`${amountOut}`}
-          onInput={this.setOutAmount}
+          // onInput={this.setOutAmount}
+          onInput={() => undefined}
           loading={state.calculator.out_loading}
           error={this.state.out_error}
         />
@@ -313,10 +470,12 @@ class ExchangeForm extends React.Component<PropTypes, StateTypes> {
                 amount: availableAmount ? `${availableAmount}` : '0',
                 curr: state.calculator.out.code
               })}</span>
-              : [
-                <span key='string'>{i18n.t('calculator.rate')}</span>,
-                <span key='rate'>{rate.toFixed(8)}</span>
-              ]
+              : state.calculator.rateNotFound
+                ? <span style={{ color: 'red' }}>{i18n.t('calculator.rateNotFound')}</span>
+                : [
+                  <span key='string'>{i18n.t('calculator.rate')}</span>,
+                  <span key='rate'>{rate.toFixed(8)}</span>
+                ]
           }
         </div>
       </div>

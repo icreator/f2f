@@ -96,13 +96,13 @@
     },
     "era_warning": {
       "header": "ATTENTION!",
-      "text": "Copy this number and paste it into the comment box in the Erachain wallet when sending ERA/Compu",
-      "click_to_copy": "Click to copy this message",
-      "wallet_copied": "Transfer message copied to your clipboard",
+      "text": "Copy payment details and paste them into the comment box in the Erachain wallet when sending ERA/Compu",
+      "click_to_copy": "Click to copy payment details",
+      "wallet_copied": "Payment details copied to your clipboard",
       "how_to_header": "NEED SOME HELP?",
       "how_to_pc": "Computer",
       "how_to_phone": "Phone",
-      "confirmation": "I've pasted specified number into the comment box in the Erachain wallet"
+      "confirmation": "I have pasted payment details into the comment box in the Erachain wallet"
     },
     "success": {
       "message": [

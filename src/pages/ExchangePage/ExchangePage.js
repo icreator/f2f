@@ -371,6 +371,7 @@ class ExchangePage extends React.Component<PropTypes, StateTypes> {
                   br: <br />
                 })}
               </p>
+              <input title={i18n.t('exchange.era_warning.click_to_copy')} value={`${state.calculator.out.code}:${this.state.out_wallet}`} readOnly onClick={(e: SyntheticEvent<HTMLInputElement>) => this.copyToClipboard(e, 'exchange.era_warning.wallet_copied')} />
             </div>
             <div className='erachain-warning-right'>
               <h3>{i18n.t('exchange.era_warning.how_to_header')}</h3>

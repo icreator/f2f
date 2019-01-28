@@ -99,8 +99,8 @@ class ExchangeForm extends React.Component<PropTypes, StateTypes> {
     if (typeof this.props.onChange === 'function') {
       this.props.onChange()
     }
-    this.loadRate(currInId, currOutId, amountOut, true)
-      .then(({ volume_out: amountIn, rate }) => {
+    this.loadInRate(currInId, currOutId, amountOut, true)
+      .then(({ volume_in: amountIn, rate }) => {
         let tooLowIn = false
         let newAmountIn = amountIn
         if (state.calculator.in.min) {
@@ -181,7 +181,7 @@ class ExchangeForm extends React.Component<PropTypes, StateTypes> {
     }
     let availableAmount = state.getAvailableAmount(currOut.id)
     if (!availableAmount) {
-      availableAmount = 0
+      availableAmount = Infinity
     }
     if (amountOutNum > availableAmount) {
       exceeded = true
@@ -334,42 +334,53 @@ class ExchangeForm extends React.Component<PropTypes, StateTypes> {
     }
   };
 
-  swap = () => {
-    const { in: out, out: currIn, amountOut: amountIn } = state.calculator
-    const amountInNum = parseFloat(amountIn)
-    let tooLowIn = false
-    if (currIn.min) {
-      if (amountInNum < currIn.min) {
-        tooLowIn = false
-      }
-    }
-    state.calculator = {
-      ...state.calculator,
-      in: currIn,
-      out,
-      amountIn: `${amountIn}`,
-      usdValue: amountInNum * state.getRate('usd', currIn.code),
-      tooLowIn,
-      tooLowOut: false
-    }
-    if (!tooLowIn) {
-      this.recalculateOutAmount(currIn.id, out.id, amountIn)
-    } else {
-      if (this.abortController !== undefined) {
-        this.abortController.abort()
-      }
-      this.setState({
-        out_error: false
-      })
-      state.calculator = {
-        ...state.calculator,
-        amountOut: '0',
-        rate: 0,
-        exceeded: false,
-        out_loading: false
-      }
-    }
-  };
+  // swap = () => {
+  //   if (this.state.lastInput === 'in') {
+  //     const { in: out, out: currIn, amountOut: amountIn } = state.calculator
+  //     const amountInNum = parseFloat(amountIn)
+  //     let tooLowIn = false
+  //     if (currIn.min) {
+  //       if (amountInNum < currIn.min) {
+  //         tooLowIn = false
+  //       }
+  //     }
+  //     state.calculator = {
+  //       ...state.calculator,
+  //       in: currIn,
+  //       out,
+  //       amountIn: `${amountIn}`,
+  //       usdValue: amountInNum * state.getRate('usd', currIn.code),
+  //       tooLowIn,
+  //       tooLowOut: false
+  //     }
+  //     if (!tooLowIn) {
+  //       this.recalculateOutAmount(currIn.id, out.id, amountIn)
+  //     } else {
+  //       if (this.abortController !== undefined) {
+  //         this.abortController.abort()
+  //       }
+  //       this.setState({
+  //         out_error: false
+  //       })
+  //       state.calculator = {
+  //         ...state.calculator,
+  //         amountOut: '0',
+  //         rate: 0,
+  //         exceeded: false,
+  //         out_loading: false
+  //       }
+  //     }
+  //   } else {
+  //     const { in: out, out: currIn, amountIn: amountOut } = state.calculator
+  //     const amountOutNum = parseFloat(amountOut)
+  //     let tooLowOut = false
+  //     if (currOut.min) {
+  //       if (amountOutNum < currOut.min) {
+  //         tooLowOut = false
+  //       }
+  //     }
+  //   }
+  // };
 
   loadRate: (currIn: number, currOut: number, amount: number, calcOut?: boolean) => Promise<{
     volume_out: number,
@@ -395,6 +406,35 @@ class ExchangeForm extends React.Component<PropTypes, StateTypes> {
     this.abortController = new NewAbortController()
     signal = this.abortController.signal
     return abortableFetch(`${state.serverName}/apipay/get_rate.json/${currIn}/${currOut}/${amount}`, {
+      signal
+    })
+      .then(r => r.json())
+  };
+
+  loadInRate: (currIn: number, currOut: number, amount: number, calcIn?: boolean) => Promise<{
+    volume_in: number,
+    rate: number
+  }> = (currIn, currOut, amount) => {
+    let signal
+    if (this.abortController !== undefined) {
+      this.abortController.abort()
+    }
+    // eslint-disable-next-line eqeqeq
+    if (amount == 0) {
+      return new Promise(resolve => resolve({
+        volume_in: 0,
+        rate: 0
+      }))
+    }
+    if (typeof NewAbortController !== 'function') {
+      return new Promise(resolve => resolve({
+        volume_in: 0,
+        rate: 0
+      }))
+    }
+    this.abortController = new NewAbortController()
+    signal = this.abortController.signal
+    return abortableFetch(`${state.serverName}/apipay/get_rate_out.json/${currIn}/${currOut}/${amount}`, {
       signal
     })
       .then(r => r.json())
@@ -450,15 +490,16 @@ class ExchangeForm extends React.Component<PropTypes, StateTypes> {
         </div>
       </div>
       <div className='swap-container'>
-        <a onClick={this.swap}>{i18n.t('calculator.swap')}</a>
+        <a
+          // onClick={this.swap}
+        >{i18n.t('calculator.swap')}</a>
       </div>
       <div className='column'>
         <CurrencySelector value={currOut} onChange={this.setOut} data={state.currencies.out} />
         <label>{i18n.t('calculator.receive')}</label>
         <CurrencyInput
           value={`${amountOut}`}
-          // onInput={this.setOutAmount}
-          onInput={() => undefined}
+          onInput={this.setOutAmount}
           loading={state.calculator.out_loading}
           error={this.state.out_error}
         />
